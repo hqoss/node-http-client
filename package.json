@@ -1,6 +1,6 @@
 {
   "name": "@hqoss/agent",
-  "version": "0.0.0-alpha.6",
+  "version": "0.0.0-alpha.7",
   "description": "A light-weight, performant, composable blueprint for writing consistent and re-usable Node.js HTTP clients.",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
