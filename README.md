@@ -1,3 +1,5 @@
+![Node.js CI](https://github.com/hqoss/node-agent/workflows/Node.js%20CI/badge.svg)
+
 # 🔌 HTTP(s) Agent
 
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
