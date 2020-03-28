@@ -18,23 +18,23 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
     -   [Intercepting requests](#intercepting-requests)
     -   [Transforming responses](#transforming-responses)
 
--   [🤤 Performance](#🤤-performance)
+-   [🤤 Performance](#-performance)
 
     -   [Default `request` setup (used by _most_ projects)](#default-request-setup-used-by-most-projects)
     -   [Default `node-fetch` setup (used by _many_ projects)](#default-node-fetch-setup-used-by-many-projects)
     -   [Default `agent` setup](#default-agent-setup)
 
--   [🧬 Core design principles](#🧬-core-design-principles)
+-   [🧬 Core design principles](#-core-design-principles)
 
--   [🧐 Why TypeScript](#🧐-why-typescript)
+-   [🧐 Why TypeScript](#-why-typescript)
 
--   [🤩 Node version support](#🤩-node-version-support)
+-   [🤩 Node version support](#-node-version-support)
 
     -   [Why ES2018](#why-es2018)
 
 -   [❤️ Testing](#️-testing)
 
--   [🤯 TODO](#🤯-todo)
+-   [🤯 TODO](#-todo)
 
 ## 🤔 Why use `agent`
 
@@ -217,7 +217,20 @@ const organisationDetails = gitHubClient.getOrganisationDetails()
 
 ## 🤤 Performance
 
-Take advantage of the out-of-the-box increase in throughput with `agent`!
+We ship `agent` with a pre-configured `HTTP(s) Agent`, which may lead to huge improvements in throughput.
+
+`agent` ships with the following configuration.
+
+```typescript
+const opts = {
+  keepAlive: true,
+  maxSockets: 64,
+  keepAliveMsecs: 5000,
+};
+
+```
+
+It is possible to override these in the constructor via providing your own `Agent` in `baseOptions`.
 
 ### Default `request` setup (used by _most_ projects)
 
