@@ -1,0 +1,48 @@
+{
+  "name": "@hqoss/agent",
+  "version": "0.0.0-alpha.0",
+  "description": "A light-weight, performant, composable blueprint for writing consistent and re-usable Node.js HTTP clients.",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "format": "prettier --write \"./{src,test}/**/*.ts\"",
+    "format:check": "prettier --check \"./{src,test}/**/*.ts\"",
+    "test": "jest",
+    "prepare": "npm run format:check && npm run build",
+    "prepublishOnly": "npm test",
+    "postversion": "git push && git push --tags"
+  },
+  "keywords": [
+    "http",
+    "https",
+    "fetch",
+    "node-fetch",
+    "javascript",
+    "js",
+    "typescript",
+    "node",
+    "node.js"
+  ],
+  "author": "Slavo Vojacek",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "tslib": "^1.11.1",
+    "url-join": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "@types/node-fetch": "^2.5.5",
+    "@types/url-join": "^4.0.0",
+    "jest": "^25.2.3",
+    "nock": "^12.0.3",
+    "prettier": "2.0.2",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:hqoss/node-agent.git"
+  }
+}
