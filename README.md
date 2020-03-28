@@ -6,6 +6,8 @@
 
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
+✅ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
+
 ## Table of contents
 
 -   [🤔 Why use `agent`](#-why-use-agent)
@@ -37,7 +39,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 -   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
 -   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
 
-`agent` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.
+**`agent` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.**
 
 -   Enforces a consistent approach to writing HTTP clients.
 
