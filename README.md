@@ -2,7 +2,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Coverage)
 
-# 🔌 HTTP(s) Agent
+# 🔌 Node Agent
 
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
@@ -43,9 +43,9 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 -   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
 -   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
 
-`agent` builds on `node-fetch` to enable composable and re-usable HTTP(s) client implementations.
+`agent` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.
 
--   Enforces a consistent approach to writing HTTP(s) clients.
+-   Enforces a consistent approach to writing HTTP clients.
 
 -   Greatly reduces common boilerplate, expressly
     -   authentication,
@@ -59,7 +59,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 ## ⏳ Install
 
-**⚠️ NOTE:** The TypeScript compiler is configured to target `ES2018` and the library uses `commonjs` module resolution (for now). Read more about [Node version support](#node-version-support).
+**⚠️ NOTE:** The TypeScript compiler is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more about [Node version support](#node-version-support).
 
 ```bash
 npm install @hqoss/agent
@@ -101,7 +101,6 @@ class GitHubClient extends HttpClient {
 }
 
 export default GitHubClient;
-
 ```
 
 Consume:
@@ -158,16 +157,11 @@ class GitHubClient extends HttpClient {
 }
 
 export default GitHubClient;
-
 ```
 
 ### Transforming responses
 
-There is a great deal of discussion on whether `fetch` shuld or should not reject non-ok responses.
-
--   <https://github.com/whatwg/fetch/issues/18>
--   <https://github.com/github/fetch/issues/155>
-
+There is a great deal of discussion on whether `fetch` should or should not reject non-ok responses [[1](https://github.com/whatwg/fetch/issues/18),[2](https://github.com/github/fetch/issues/155)].
 We believe such design choices should ultimately be made by individual engineering teams, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
 
 ```typescript
@@ -196,7 +190,6 @@ class GitHubClient extends HttpClient {
 }
 
 export default GitHubClient;
-
 ```
 
 Consume:
@@ -236,7 +229,7 @@ It is possible to override these in the constructor via providing your own `Agen
 
 😰 Requests/sec: **362.19**
 
-```bash
+```
 wrk -t5 -c500 -d30s http://localhost:3001/request
 
 Running 30s test @ http://localhost:3001/request
@@ -254,7 +247,7 @@ Transfer/sec:      6.19MB
 
 😥 Requests/sec: **286.98**
 
-```bash
+```
 wrk -t5 -c500 -d30s http://localhost:3001/fetch
 
 Running 30s test @ http://localhost:3001/fetch
@@ -272,7 +265,7 @@ Transfer/sec:      4.90MB
 
 🎉 Requests/sec: **2370.72**
 
-```bash
+```
 wrk -t5 -c500 -d30s http://localhost:3001/http-client
 
 Running 30s test @ http://localhost:3001/
@@ -286,7 +279,7 @@ Requests/sec:   2370.72
 Transfer/sec:     40.52MB
 ```
 
-These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9; 64 GB 2667 MHz DDR4** machine. We tested the different implementations of an inter-service HTTP GET request with `request`, `node-fetch`, and `agent` respectively. The services involved were running locally, and the payload consisted of a list of 100 users, each with 6 basic properties. The benchmarks ran for 30 seconds, using 5 threads and keeping 500 HTTP connections open.
+These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9** machine. We tested the different implementations of an inter-service HTTP GET request with `request`, `node-fetch`, and `agent` respectively. The services involved were running locally, and the payload consisted of a list of 100 users, each with 6 basic properties. The benchmarks ran for 30 seconds, using 5 threads and keeping 500 HTTP connections open.
 
 ## 🧬 Core design principles
 
@@ -332,7 +325,7 @@ From the release notes:
 
 ## ❤️ Testing
 
-[Ava](https://github.com/avajs/ava) and [Jest](https://jestjs.io/) were considered. Jest was chosen (for now) as it is very easy to configure and includes most of the features we need out-of-the-box.
+[Ava](https://github.com/avajs/ava) and [Jest](https://jestjs.io/) were considered. Jest was chosen as it is very easy to configure and includes most of the features we need out-of-the-box.
 
 Further investigation will be launched in foreseeable future to consider moving to Ava.
 
