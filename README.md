@@ -208,7 +208,11 @@ const organisationDetails = gitHubClient.getOrganisationDetails()
 
 We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which may lead to a huge increase in throughput.
 
-For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from another service, these were the results:
+For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from one service to another (see diagram below), these were the results:
+
+```
+| wrk | -HTTP-> | Server A -> HttpClient | -HTTP-> | Server B -> data in memory |
+```
 
 -   Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
 -   Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
