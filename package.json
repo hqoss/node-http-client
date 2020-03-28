@@ -13,6 +13,7 @@
     "format": "prettier --write \"./{src,test}/**/*.ts\"",
     "format:check": "prettier --check \"./{src,test}/**/*.ts\"",
     "test": "jest",
+    "preversion": "npm run format:check && npm run build && npm test",
     "prepublishOnly": "npm run format:check && npm run build && npm test",
     "postversion": "git push --follow-tags"
   },
