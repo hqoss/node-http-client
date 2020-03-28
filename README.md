@@ -1,5 +1,6 @@
 ![Node.js CI](https://github.com/hqoss/node-agent/workflows/Node.js%20CI/badge.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0784478abefd4a59be778118ee1265d8)](https://app.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade_Dashboard)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Coverage)
 
 # 🔌 HTTP(s) Agent
 
@@ -7,7 +8,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 ## Table of contents
 
--   [🤔 Why use `agent`?](#-why-use-agent)
+-   [🤔 Why use `agent`](#-why-use-agent)
 
 -   [⏳ Install](#-install)
 
@@ -35,7 +36,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 -   [🤯 TODO](#🤯-todo)
 
-## 🤔 Why use `agent`?
+## 🤔 Why use `agent`
 
 ... as opposed to `request` or `node-fetch`?
 
@@ -45,6 +46,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 `agent` builds on `node-fetch` to enable composable and re-usable HTTP(s) client implementations.
 
 -   Enforces a consistent approach to writing HTTP(s) clients.
+
 -   Greatly reduces common boilerplate, expressly
     -   authentication,
     -   default headers,
@@ -52,6 +54,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
     -   composing urls,
     -   connection pooling,
     -   parsing responses, and more.
+
 -   It is written in TypeScript.
 
 ## ⏳ Install
