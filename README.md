@@ -7,21 +7,21 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 ## Legend
 
-- [🤔 Why use `agent`?](#-why-use-agent)
-- [⏳ Install](#-install)
-- [📝 Usage](#usage)
-  - [Basic](#basic)
-  - [Intercepting requests](#intercepting-requests)
-  - [Transforming responses](#transforming-responses)
-- [🤤 Performance](#-performance)
-- [🧬 Core design principles](#-core-design-principles)
-- [🧐 Why TypeScript?](#-why-typescript)
-  - [Technical excellence and agile ways of working](#technical-excellence-and-agile-ways-of-working)
-  - [Encourage Best Practices](#encourage-best-practices)
-- [🤩 Node version support](#-node-version-support)
-  - [Why ES2018?](#why-es2018)
-- [❤️ Testing](#-testing)
-- [🤯 TODO](#-todo)
+  - [🤔 Why use `agent`?](#-why-use-agent)
+  - [⏳ Install](#-install)
+  - [📝 Usage](#usage)
+    - [Basic](#basic)
+    - [Intercepting requests](#intercepting-requests)
+    - [Transforming responses](#transforming-responses)
+  - [🤤 Performance](#-performance)
+  - [🧬 Core design principles](#-core-design-principles)
+  - [🧐 Why TypeScript?](#-why-typescript)
+    - [Technical excellence and agile ways of working](#technical-excellence-and-agile-ways-of-working)
+    - [Encourage Best Practices](#encourage-best-practices)
+  - [🤩 Node version support](#-node-version-support)
+    - [Why ES2018?](#why-es2018)
+  - [❤️ Testing](#-testing)
+  - [🤯 TODO](#-todo)
 
 ## 🤔 Why use `agent`?
 
@@ -32,15 +32,15 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 `agent` builds on `node-fetch` to enable composable and re-usable HTTP(s) client implementations.
 
-- Enforces a consistent approach to writing HTTP(s) clients.
-- Greatly reduces common boilerplate, expressly
-  - authentication,
-  - default headers,
-  - default options,
-  - composing urls,
-  - connection pooling,
-  - parsing responses, and more.
-- It is written in TypeScript.
+  - Enforces a consistent approach to writing HTTP(s) clients.
+  - Greatly reduces common boilerplate, expressly
+    - authentication,
+    - default headers,
+    - default options,
+    - composing urls,
+    - connection pooling,
+    - parsing responses, and more.
+  - It is written in TypeScript.
 
 ## ⏳ Install
 
