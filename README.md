@@ -158,7 +158,7 @@ export default GitHubClient;
 ### Transforming responses
 
 There is a great deal of discussion on whether `fetch` should or should not reject non-ok responses \[[1](https://github.com/whatwg/fetch/issues/18),[2](https://github.com/github/fetch/issues/155)].
-We believe such design choices should ultimately be made by individual engineering teams, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
+We believe such design choices should ultimately be made by the consumers, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
 
 ```typescript
 import { HttpClient, ResponseTransformer } from "@asri/agent";
