@@ -62,7 +62,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 **⚠️ NOTE:** The TypeScript compiler is configured to target `ES2018` and the library uses `commonjs` module resolution (for now). Read more about [Node version support](#node-version-support).
 
 ```bash
-npm install @asri/agent
+npm install @hqoss/agent
 # Additionally, for TypeScript users
 npm install @types/node-fetch --save-dev
 ```
