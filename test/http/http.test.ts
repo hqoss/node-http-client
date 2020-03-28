@@ -224,11 +224,6 @@ describe("HttpClient", () => {
       };
 
       class TestHttpClient extends HttpClient {
-        constructor() {
-          super({ baseUrl, baseOptions: { compress: false } });
-        }
-
-        // In production environment, this can be used to log the request.
         protected willSendRequest: RequestInterceptor = (url, request) => {
           args.url = url;
           args.request = request;
@@ -239,7 +234,10 @@ describe("HttpClient", () => {
         };
       }
 
-      const httpClient = new TestHttpClient();
+      const httpClient = new TestHttpClient({
+        baseUrl,
+        baseOptions: { timeout: 750 },
+      });
 
       const url = "/202";
 
@@ -261,7 +259,7 @@ describe("HttpClient", () => {
           [HeaderKey.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Get,
-        compress: false,
+        timeout: 750,
       });
     });
 
@@ -421,6 +419,55 @@ describe("HttpClient", () => {
       expect(response).toEqual(expectedReply);
     });
 
+    it("runs willSendRequest with the url and request init when defined", async () => {
+      let args: {
+        url: string;
+        request: RequestInit;
+      } = {
+        url: null!,
+        request: null!,
+      };
+
+      class TestHttpClient extends HttpClient {
+        protected willSendRequest: RequestInterceptor = (url, request) => {
+          args.url = url;
+          args.request = request;
+
+          Object.assign(request.headers, {
+            [HeaderKey.UserAgent]: "TestHttpClient",
+          });
+        };
+      }
+
+      const httpClient = new TestHttpClient({
+        baseUrl,
+        baseOptions: { timeout: 750 },
+      });
+
+      const url = "/202";
+
+      const expectedReply = {
+        code: 202,
+        description: "Accepted",
+      };
+
+      scope
+        .post(url)
+        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .reply(expectedReply.code, expectedReply);
+
+      await httpClient.post(url);
+
+      expect(args.url).toEqual(urlJoin(baseUrl, url));
+      expect(args.request).toMatchObject({
+        headers: {
+          [HeaderKey.UserAgent]: "TestHttpClient",
+        },
+        method: HttpMethod.Post,
+        timeout: 750,
+      });
+    });
+
     it("in json mode, nullable request body is omitted", async () => {
       const httpClient = new HttpClient({ baseUrl, json: true });
 
@@ -503,6 +550,55 @@ describe("HttpClient", () => {
 
       expect(response).toBeInstanceOf(Response);
       expect(await response.text()).toEqual(expectedReply);
+    });
+
+    it("runs willSendRequest with the url and request init when defined", async () => {
+      let args: {
+        url: string;
+        request: RequestInit;
+      } = {
+        url: null!,
+        request: null!,
+      };
+
+      class TestHttpClient extends HttpClient {
+        protected willSendRequest: RequestInterceptor = (url, request) => {
+          args.url = url;
+          args.request = request;
+
+          Object.assign(request.headers, {
+            [HeaderKey.UserAgent]: "TestHttpClient",
+          });
+        };
+      }
+
+      const httpClient = new TestHttpClient({
+        baseUrl,
+        baseOptions: { timeout: 750 },
+      });
+
+      const url = "/202";
+
+      const expectedReply = {
+        code: 202,
+        description: "Accepted",
+      };
+
+      scope
+        .put(url)
+        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .reply(expectedReply.code, expectedReply);
+
+      await httpClient.put(url);
+
+      expect(args.url).toEqual(urlJoin(baseUrl, url));
+      expect(args.request).toMatchObject({
+        headers: {
+          [HeaderKey.UserAgent]: "TestHttpClient",
+        },
+        method: HttpMethod.Put,
+        timeout: 750,
+      });
     });
 
     it("in json mode, nullable request body is omitted", async () => {
@@ -597,6 +693,55 @@ describe("HttpClient", () => {
       expect(await response.text()).toEqual(expectedReply);
     });
 
+    it("runs willSendRequest with the url and request init when defined", async () => {
+      let args: {
+        url: string;
+        request: RequestInit;
+      } = {
+        url: null!,
+        request: null!,
+      };
+
+      class TestHttpClient extends HttpClient {
+        protected willSendRequest: RequestInterceptor = (url, request) => {
+          args.url = url;
+          args.request = request;
+
+          Object.assign(request.headers, {
+            [HeaderKey.UserAgent]: "TestHttpClient",
+          });
+        };
+      }
+
+      const httpClient = new TestHttpClient({
+        baseUrl,
+        baseOptions: { timeout: 750 },
+      });
+
+      const url = "/202";
+
+      const expectedReply = {
+        code: 202,
+        description: "Accepted",
+      };
+
+      scope
+        .patch(url)
+        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .reply(expectedReply.code, expectedReply);
+
+      await httpClient.patch(url);
+
+      expect(args.url).toEqual(urlJoin(baseUrl, url));
+      expect(args.request).toMatchObject({
+        headers: {
+          [HeaderKey.UserAgent]: "TestHttpClient",
+        },
+        method: HttpMethod.Patch,
+        timeout: 750,
+      });
+    });
+
     it("in json mode, nullable request body is omitted", async () => {
       const httpClient = new HttpClient({ baseUrl, json: true });
 
@@ -681,7 +826,8 @@ describe("HttpClient", () => {
         )
         .reply(202, expectedReply);
 
-      const response = await httpClient.delete<Response>(url, requestBody, {
+      const response = await httpClient.delete<Response>(url, {
+        body: requestBody,
         headers: requestHeaders,
       });
 
@@ -689,39 +835,53 @@ describe("HttpClient", () => {
       expect(await response.text()).toEqual(expectedReply);
     });
 
-    it("in json mode, nullable request body is omitted", async () => {
-      const httpClient = new HttpClient({ baseUrl, json: true });
+    it("runs willSendRequest with the url and request init when defined", async () => {
+      let args: {
+        url: string;
+        request: RequestInit;
+      } = {
+        url: null!,
+        request: null!,
+      };
 
-      const url = "/delete-and-reply-with-200";
-      const requestBody = { foo: "bar" };
+      class TestHttpClient extends HttpClient {
+        protected willSendRequest: RequestInterceptor = (url, request) => {
+          args.url = url;
+          args.request = request;
+
+          Object.assign(request.headers, {
+            [HeaderKey.UserAgent]: "TestHttpClient",
+          });
+        };
+      }
+
+      const httpClient = new TestHttpClient({
+        baseUrl,
+        baseOptions: { timeout: 750 },
+      });
+
+      const url = "/202";
 
       const expectedReply = {
-        code: 200,
-        description: "OK",
+        code: 202,
+        description: "Accepted",
       };
 
       scope
-        .delete(url, requestBody)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
-        .reply(expectedReply.code, expectedReply)
         .delete(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
-        .reply(expectedReply.code, expectedReply)
-        .delete(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
-      const response = await httpClient.delete(url, requestBody);
-      const responseWithNullBody = await httpClient.delete(url, null);
-      const responseWithUndefinedBody = await httpClient.delete(url, undefined);
+      await httpClient.delete(url);
 
-      expect(response).toEqual(expectedReply);
-
-      expect(response).toEqual(responseWithNullBody);
-      expect(responseWithNullBody).toEqual(responseWithUndefinedBody);
+      expect(args.url).toEqual(urlJoin(baseUrl, url));
+      expect(args.request).toMatchObject({
+        headers: {
+          [HeaderKey.UserAgent]: "TestHttpClient",
+        },
+        method: HttpMethod.Delete,
+        timeout: 750,
+      });
     });
   });
 });

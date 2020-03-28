@@ -62,9 +62,14 @@ class HttpClient {
   }
 
   get = async <T>(url: string, req: RequestInit = {}): Promise<T> => {
-    const { buildRequestArgs, transformResponse } = this;
+    const { buildRequestArgs, transformResponse, willSendRequest } = this;
 
     const args = await buildRequestArgs(url, HttpMethod.Get, undefined, req);
+
+    if (willSendRequest) {
+      await willSendRequest(args.url, args.request);
+    }
+
     const response = await fetch(args.url, args.request);
 
     return transformResponse(response);
@@ -75,9 +80,14 @@ class HttpClient {
     body?: any,
     req: RequestInit = {},
   ): Promise<T> => {
-    const { buildRequestArgs, transformResponse } = this;
+    const { buildRequestArgs, transformResponse, willSendRequest } = this;
 
     const args = await buildRequestArgs(url, HttpMethod.Post, body, req);
+
+    if (willSendRequest) {
+      await willSendRequest(args.url, args.request);
+    }
+
     const response = await fetch(args.url, args.request);
 
     return transformResponse(response);
@@ -88,9 +98,14 @@ class HttpClient {
     body?: any,
     req: RequestInit = {},
   ): Promise<T> => {
-    const { buildRequestArgs, transformResponse } = this;
+    const { buildRequestArgs, transformResponse, willSendRequest } = this;
 
     const args = await buildRequestArgs(url, HttpMethod.Put, body, req);
+
+    if (willSendRequest) {
+      await willSendRequest(args.url, args.request);
+    }
+
     const response = await fetch(args.url, args.request);
 
     return transformResponse(response);
@@ -101,44 +116,43 @@ class HttpClient {
     body?: any,
     req: RequestInit = {},
   ): Promise<T> => {
-    const { buildRequestArgs, transformResponse } = this;
+    const { buildRequestArgs, transformResponse, willSendRequest } = this;
 
     const args = await buildRequestArgs(url, HttpMethod.Patch, body, req);
+
+    if (willSendRequest) {
+      await willSendRequest(args.url, args.request);
+    }
+
     const response = await fetch(args.url, args.request);
 
     return transformResponse(response);
   };
 
-  delete = async <T>(
-    url: string,
-    body?: any,
-    req: RequestInit = {},
-  ): Promise<T> => {
-    const { buildRequestArgs, transformResponse } = this;
+  delete = async <T>(url: string, req: RequestInit = {}): Promise<T> => {
+    const { buildRequestArgs, transformResponse, willSendRequest } = this;
 
-    const args = await buildRequestArgs(url, HttpMethod.Delete, body, req);
+    const args = await buildRequestArgs(url, HttpMethod.Delete, undefined, req);
+
+    if (willSendRequest) {
+      await willSendRequest(args.url, args.request);
+    }
+
     const response = await fetch(args.url, args.request);
 
     return transformResponse(response);
   };
 
-  buildRequestArgs = async (
+  private buildRequestArgs = async (
     url: string,
     method: HttpMethod,
     body: any,
     opts: RequestInit,
   ): Promise<{ url: string; request: RequestInit }> => {
-    const {
-      baseUrl,
-      baseHeaders,
-      baseOptions,
-      buildUrl,
-      useJson,
-      willSendRequest,
-    } = this;
+    const { baseUrl, baseHeaders, baseOptions, useJson } = this;
 
     const args = {
-      url: buildUrl(baseUrl, url),
+      url: urlJoin(baseUrl, url),
       request: {
         // First, use base/shared options
         ...baseOptions,
@@ -156,14 +170,8 @@ class HttpClient {
       },
     };
 
-    if (willSendRequest) {
-      await willSendRequest(args.url, args.request);
-    }
-
     return args;
   };
-
-  buildUrl = (...args: Array<string>) => urlJoin(...args);
 }
 
 export default HttpClient;
