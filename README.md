@@ -1,4 +1,5 @@
 ![Node.js CI](https://github.com/hqoss/node-agent/workflows/Node.js%20CI/badge.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0784478abefd4a59be778118ee1265d8)](https://app.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade_Dashboard)
 
 # 🔌 HTTP(s) Agent
 
