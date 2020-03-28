@@ -26,15 +26,13 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 -   [🧬 Core design principles](#-core-design-principles)
 
--   [🧐 Why TypeScript](#-why-typescript)
-
--   [🤩 Node version support](#-node-version-support)
+-   [Node version support](#-node-version-support)
 
     -   [Why ES2018](#why-es2018)
 
--   [❤️ Testing](#️-testing)
+-   [❤ Testing](#️-testing)
 
--   [🤯 TODO](#-todo)
+-   [TODO](#-todo)
 
 ## 🤔 Why use `agent`
 
@@ -69,7 +67,7 @@ npm install @types/node-fetch --save-dev
 
 ## 📝 Usage
 
-**⚠️ WARNING:** Unlike `request`, `node-fetch` does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). If you wish, you can mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
+**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). If you wish, you can mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
 
 ### Basic
 
@@ -210,9 +208,17 @@ const organisationDetails = gitHubClient.getOrganisationDetails()
 
 ## 🤤 Performance
 
-We ship `agent` with a pre-configured `HTTP(s) Agent`, which may lead to huge improvements in throughput.
+We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which may lead to a huge increase in throughput.
 
-`agent` ships with the following configuration.
+For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from another service, these were the results:
+
+- Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
+- Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
+- Default `agent` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
+
+Please note that these benchmarks were run through `wrk`, each lasting 30 seconds, using 5 threads and keeping 500 connections open.
+
+The `HttpClient` within `agent` ships with the following configuration.
 
 ```typescript
 const opts = {
@@ -225,62 +231,6 @@ const opts = {
 
 It is possible to override these in the constructor via providing your own `Agent` in `baseOptions`.
 
-### Default `request` setup (used by _most_ projects)
-
-😰 Requests/sec: **362.19**
-
-```
-wrk -t5 -c500 -d30s http://localhost:3001/request
-
-Running 30s test @ http://localhost:3001/request
-  5 threads and 500 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   660.35ms  389.35ms   1.50s    59.19%
-    Req/Sec    87.36     66.56   350.00     80.29%
-  10893 requests in 30.08s, 186.18MB read
-  Socket errors: connect 254, read 109, write 0, timeout 0
-Requests/sec:    362.19
-Transfer/sec:      6.19MB
-```
-
-### Default `node-fetch` setup (used by _many_ projects)
-
-😥 Requests/sec: **286.98**
-
-```
-wrk -t5 -c500 -d30s http://localhost:3001/fetch
-
-Running 30s test @ http://localhost:3001/fetch
-  5 threads and 500 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   691.28ms  281.70ms   1.50s    76.50%
-    Req/Sec    76.03     45.21   252.00     71.53%
-  8632 requests in 30.08s, 147.54MB read
-  Socket errors: connect 254, read 316, write 0, timeout 61
-Requests/sec:    286.98
-Transfer/sec:      4.90MB
-```
-
-### Default `agent` setup
-
-🎉 Requests/sec: **2370.72**
-
-```
-wrk -t5 -c500 -d30s http://localhost:3001/http-client
-
-Running 30s test @ http://localhost:3001/
-  5 threads and 500 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    70.92ms   57.73ms   1.90s    94.05%
-    Req/Sec   555.13    164.19   770.00     84.07%
-  71359 requests in 30.10s, 1.19GB read
-  Socket errors: connect 254, read 377, write 0, timeout 77
-Requests/sec:   2370.72
-Transfer/sec:     40.52MB
-```
-
-These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9** machine. We tested the different implementations of an inter-service HTTP GET request with `request`, `node-fetch`, and `agent` respectively. The services involved were running locally, and the payload consisted of a list of 100 users, each with 6 basic properties. The benchmarks ran for 30 seconds, using 5 threads and keeping 500 HTTP connections open.
-
 ## 🧬 Core design principles
 
 -   **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
@@ -289,27 +239,9 @@ These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9** 
 
 -   **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
 
-## 🧐 Why TypeScript
+## Node version support
 
-In line with our guiding principles, this package is written in TypeScript.
-
-While the use of TypeScript is not prescribed, it is worth noting that adopting it _may_ result in increased productivity, as well as happier engineering teams.
-
-We've compiled a few reasons why _we_ ❤️ and recommend taking full advantage of TypeScript.
-
--   **Great tooling and overall developer experience.** Strong and thriving open-source community, backed by Microsoft.
-
--   **Increased productivity.** Type inference, intelligent code completion, and refactoring in confidence all contribute to increased productivity through minimising a specific class of bugs, reducing boilerplate, and maintaining a healthy codebase.
-
--   **Helps attract and retain the best talent.** TypeScript consistently ranks as one of the most loved _and_ wanted languages in the annual StackOverflow developer surveys.
-
--   **A taste of future JavaScript, with _optional_ types.** Always up-to-date with upcoming ECMA features, compliant with proposals/specs.
-
-You can read more about TypeScript in [the handbook](https://www.typescriptlang.org/docs/handbook/).
-
-## 🤩 Node version support
-
-The TypeScript compiler is configured to target ES2018. In practice, this means projects consuming this package should run on Node 12 or higher, unless additional compilation/transpilation steps are in place to ensure compatibility with the target runtime.
+The project is configured to target ES2018. In practice, this means consumers should run on Node 12 or higher, unless additional compilation/transpilation steps are in place to ensure compatibility with the target runtime.
 
 Please see <https://node.green/#ES2018> for reference.
 
@@ -331,7 +263,7 @@ Further investigation will be launched in foreseeable future to consider moving 
 
 We prefer using [Nock](https://github.com/nock/nock) over mocking.
 
-## 🤯 TODO
+## TODO
 
 A quick and dirty tech debt tracker before we move to Issues.
 
