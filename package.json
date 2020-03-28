@@ -4,14 +4,17 @@
   "description": "A light-weight, performant, composable blueprint for writing consistent and re-usable Node.js HTTP clients.",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=12",
+    "npm": ">=6"
+  },
   "scripts": {
     "build": "rm -rf ./dist && tsc",
     "format": "prettier --write \"./{src,test}/**/*.ts\"",
     "format:check": "prettier --check \"./{src,test}/**/*.ts\"",
     "test": "jest",
-    "prepare": "npm run format:check && npm run build",
-    "prepublishOnly": "npm test",
-    "postversion": "git push && git push --tags"
+    "prepublishOnly": "npm run format:check && npm run build && npm test",
+    "postversion": "git push --follow-tags"
   },
   "keywords": [
     "http",
