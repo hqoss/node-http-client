@@ -4,8 +4,9 @@
 name: Build and publish a Node.js package
 
 on:
-  release:
-    types: [ created ]
+  push:
+    tags:
+      - v*
 
 jobs:
   build:
