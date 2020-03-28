@@ -20,19 +20,15 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 -   [🤤 Performance](#-performance)
 
-    -   [Default `request` setup (used by _most_ projects)](#default-request-setup-used-by-most-projects)
-    -   [Default `node-fetch` setup (used by _many_ projects)](#default-node-fetch-setup-used-by-many-projects)
-    -   [Default `agent` setup](#default-agent-setup)
-
 -   [🧬 Core design principles](#-core-design-principles)
 
--   [Node version support](#-node-version-support)
+-   [Node version support](#node-version-support)
 
     -   [Why ES2018](#why-es2018)
 
--   [❤ Testing](#️-testing)
+-   [❤️ Testing](#️-testing)
 
--   [TODO](#-todo)
+-   [TODO](#todo)
 
 ## 🤔 Why use `agent`
 
@@ -57,7 +53,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 ## ⏳ Install
 
-**⚠️ NOTE:** The TypeScript compiler is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more about [Node version support](#node-version-support).
+**⚠️ NOTE:** The project is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more in the [Node version support](#node-version-support) section.
 
 ```bash
 npm install @hqoss/agent
@@ -67,7 +63,7 @@ npm install @types/node-fetch --save-dev
 
 ## 📝 Usage
 
-**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). If you wish, you can mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
+**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
 
 ### Basic
 
@@ -159,7 +155,7 @@ export default GitHubClient;
 
 ### Transforming responses
 
-There is a great deal of discussion on whether `fetch` should or should not reject non-ok responses [[1](https://github.com/whatwg/fetch/issues/18),[2](https://github.com/github/fetch/issues/155)].
+There is a great deal of discussion on whether `fetch` should or should not reject non-ok responses \[[1](https://github.com/whatwg/fetch/issues/18),[2](https://github.com/github/fetch/issues/155)].
 We believe such design choices should ultimately be made by individual engineering teams, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
 
 ```typescript
@@ -212,13 +208,13 @@ We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which 
 
 For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from another service, these were the results:
 
-- Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
-- Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
-- Default `agent` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
+-   Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
+-   Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
+-   Default `agent` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
 
 Please note that these benchmarks were run through `wrk`, each lasting 30 seconds, using 5 threads and keeping 500 connections open.
 
-The `HttpClient` within `agent` ships with the following configuration.
+This is the default `Agent` configuration, which can easily be overriden in the `HttpClient` constructor. You can simply provide your own `Agent` instance in `baseOptions`.
 
 ```typescript
 const opts = {
@@ -226,10 +222,7 @@ const opts = {
   maxSockets: 64,
   keepAliveMsecs: 5000,
 };
-
 ```
-
-It is possible to override these in the constructor via providing your own `Agent` in `baseOptions`.
 
 ## 🧬 Core design principles
 
