@@ -19,17 +19,17 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 -   [🤤 Performance](#🤤-performance)
 
-    -   [Default `request` setup (used by _most_ projects):](#default-request-setup-used-by-most-projects)
-    -   [Default `node-fetch` setup (used by _many_ projects):](#default-node-fetch-setup-used-by-many-projects)
-    -   [Default `agent` setup:](#default-agent-setup)
+    -   [Default `request` setup (used by _most_ projects)](#default-request-setup-used-by-most-projects)
+    -   [Default `node-fetch` setup (used by _many_ projects)](#default-node-fetch-setup-used-by-many-projects)
+    -   [Default `agent` setup](#default-agent-setup)
 
 -   [🧬 Core design principles](#🧬-core-design-principles)
 
--   [🧐 Why TypeScript?](#🧐-why-typescript)
+-   [🧐 Why TypeScript](#🧐-why-typescript)
 
 -   [🤩 Node version support](#🤩-node-version-support)
 
-    -   [Why ES2018?](#why-es2018)
+    -   [Why ES2018](#why-es2018)
 
 -   [❤️ Testing](#️-testing)
 
@@ -216,7 +216,7 @@ const organisationDetails = gitHubClient.getOrganisationDetails()
 
 Take advantage of the out-of-the-box increase in throughput with `agent`!
 
-### Default `request` setup (used by _most_ projects):
+### Default `request` setup (used by _most_ projects)
 
 😰 Requests/sec: **362.19**
 
@@ -234,7 +234,7 @@ Requests/sec:    362.19
 Transfer/sec:      6.19MB
 ```
 
-### Default `node-fetch` setup (used by _many_ projects):
+### Default `node-fetch` setup (used by _many_ projects)
 
 😥 Requests/sec: **286.98**
 
@@ -252,7 +252,7 @@ Requests/sec:    286.98
 Transfer/sec:      4.90MB
 ```
 
-### Default `agent` setup:
+### Default `agent` setup
 
 🎉 Requests/sec: **2370.72**
 
@@ -280,7 +280,7 @@ These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9; 6
 
 -   **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
 
-## 🧐 Why TypeScript?
+## 🧐 Why TypeScript
 
 In line with our guiding principles, this package is written in TypeScript.
 
@@ -304,7 +304,7 @@ The TypeScript compiler is configured to target ES2018. In practice, this means 
 
 Please see <https://node.green/#ES2018> for reference.
 
-### Why ES2018?
+### Why ES2018
 
 Firstly, according to the official [Node release schedule](https://github.com/nodejs/Release), Node 12.x entered LTS on 2019-10-21 and is scheduled to enter Maintenance on 2020-10-20. With the End-of-Life scheduled for April 2022, we are confident that most users will now be running 12.x or higher.
 
