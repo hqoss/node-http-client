@@ -2,6 +2,8 @@
 
 # 🔌 HTTP(s) Agent
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0784478abefd4a59be778118ee1265d8)](https://app.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade_Dashboard)
+
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
 ## Legend
