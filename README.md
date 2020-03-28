@@ -7,40 +7,40 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
 
 ## Legend
 
-  - [🤔 Why use `agent`?](#-why-use-agent)
-  - [⏳ Install](#-install)
-  - [📝 Usage](#usage)
-    - [Basic](#basic)
-    - [Intercepting requests](#intercepting-requests)
-    - [Transforming responses](#transforming-responses)
-  - [🤤 Performance](#-performance)
-  - [🧬 Core design principles](#-core-design-principles)
-  - [🧐 Why TypeScript?](#-why-typescript)
-    - [Technical excellence and agile ways of working](#technical-excellence-and-agile-ways-of-working)
-    - [Encourage Best Practices](#encourage-best-practices)
-  - [🤩 Node version support](#-node-version-support)
-    - [Why ES2018?](#why-es2018)
-  - [❤️ Testing](#-testing)
-  - [🤯 TODO](#-todo)
+-   [🤔 Why use `agent`?](#-why-use-agent)
+-   [⏳ Install](#-install)
+-   [📝 Usage](#usage)
+    -   [Basic](#basic)
+    -   [Intercepting requests](#intercepting-requests)
+    -   [Transforming responses](#transforming-responses)
+-   [🤤 Performance](#-performance)
+-   [🧬 Core design principles](#-core-design-principles)
+-   [🧐 Why TypeScript?](#-why-typescript)
+    -   [Technical excellence and agile ways of working](#technical-excellence-and-agile-ways-of-working)
+    -   [Encourage Best Practices](#encourage-best-practices)
+-   [🤩 Node version support](#-node-version-support)
+    -   [Why ES2018?](#why-es2018)
+-   [❤️ Testing](#-testing)
+-   [🤯 TODO](#-todo)
 
 ## 🤔 Why use `agent`?
 
 ... as opposed to `request` or `node-fetch`?
 
-- `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
-- Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
+-   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
+-   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
 
 `agent` builds on `node-fetch` to enable composable and re-usable HTTP(s) client implementations.
 
-  - Enforces a consistent approach to writing HTTP(s) clients.
-  - Greatly reduces common boilerplate, expressly
-    - authentication,
-    - default headers,
-    - default options,
-    - composing urls,
-    - connection pooling,
-    - parsing responses, and more.
-  - It is written in TypeScript.
+-   Enforces a consistent approach to writing HTTP(s) clients.
+-   Greatly reduces common boilerplate, expressly
+    -   authentication,
+    -   default headers,
+    -   default options,
+    -   composing urls,
+    -   connection pooling,
+    -   parsing responses, and more.
+-   It is written in TypeScript.
 
 ## ⏳ Install
 
@@ -150,8 +150,8 @@ export default GitHubClient;
 
 There is a great deal of discussion on whether `fetch` shuld or should not reject non-ok responses.
 
-* https://github.com/whatwg/fetch/issues/18
-* https://github.com/github/fetch/issues/155
+-   <https://github.com/whatwg/fetch/issues/18>
+-   <https://github.com/github/fetch/issues/155>
 
 We believe such design choices should ultimately be made by individual engineering teams, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
 
@@ -262,11 +262,11 @@ These tests were all performed on an identical **2.4 GHz 8-Core Intel Core i9; 6
 
 ## 🧬 Core design principles
 
-* **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
+-   **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
 
-* **Developer experience**; Developers must be able to use this package with no significant barriers to entry. It has to be easy-to-find, well-documented, and pleasant to use.
+-   **Developer experience**; Developers must be able to use this package with no significant barriers to entry. It has to be easy-to-find, well-documented, and pleasant to use.
 
-* **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
+-   **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
 
 ## 🧐 Why TypeScript?
 
@@ -276,13 +276,13 @@ While the use of TypeScript is not prescribed, it is worth noting that adopting 
 
 We've compiled a few reasons why _we_ ❤️ and recommend taking full advantage of TypeScript.
 
-* **Great tooling and overall developer experience.** Strong and thriving open-source community, backed by Microsoft.
+-   **Great tooling and overall developer experience.** Strong and thriving open-source community, backed by Microsoft.
 
-* **Increased productivity.** Type inference, intelligent code completion, and refactoring in confidence all contribute to increased productivity through minimising a specific class of bugs, reducing boilerplate, and maintaining a healthy codebase.
+-   **Increased productivity.** Type inference, intelligent code completion, and refactoring in confidence all contribute to increased productivity through minimising a specific class of bugs, reducing boilerplate, and maintaining a healthy codebase.
 
-* **Helps attract and retain the best talent.** TypeScript consistently ranks as one of the most loved _and_ wanted languages in the annual StackOverflow developer surveys.
+-   **Helps attract and retain the best talent.** TypeScript consistently ranks as one of the most loved _and_ wanted languages in the annual StackOverflow developer surveys.
 
-* **A taste of future JavaScript, with _optional_ types.** Always up-to-date with upcoming ECMA features, compliant with proposals/specs.
+-   **A taste of future JavaScript, with _optional_ types.** Always up-to-date with upcoming ECMA features, compliant with proposals/specs.
 
 You can read more about TypeScript in [the handbook](https://www.typescriptlang.org/docs/handbook/).
 
@@ -290,7 +290,7 @@ You can read more about TypeScript in [the handbook](https://www.typescriptlang.
 
 The TypeScript compiler is configured to target ES2018. In practice, this means projects consuming this package should run on Node 12 or higher, unless additional compilation/transpilation steps are in place to ensure compatibility with the target runtime.
 
-Please see [https://node.green/#ES2018](https://node.green/#ES2018) for reference.
+Please see <https://node.green/#ES2018> for reference.
 
 ### Why ES2018?
 
@@ -314,12 +314,12 @@ We prefer using [Nock](https://github.com/nock/nock) over mocking.
 
 A quick and dirty tech debt tracker before we move to Issues.
 
-* [ ] Write a **Contributing** guide
-* [ ] Complete testing section, add best practices
-* [ ] Describe scripts and usage, add best practices
-* [ ] Add typespec and generate docs
-* [ ] Describe security best practices, e.g. `npm doctor`, `npm audit`, `npm outdated`, `ignore-scripts` in `.npmrc`, etc.
-* [ ] Add "Why should I use this" section
-* [ ] Implement and document support for basic auth
-* [ ] Document `willSendRequest` and `reponseTransformer`
-* [ ] Library architectural design (+ diagram?)
+-   [ ] Write a **Contributing** guide
+-   [ ] Complete testing section, add best practices
+-   [ ] Describe scripts and usage, add best practices
+-   [ ] Add typespec and generate docs
+-   [ ] Describe security best practices, e.g. `npm doctor`, `npm audit`, `npm outdated`, `ignore-scripts` in `.npmrc`, etc.
+-   [ ] Add "Why should I use this" section
+-   [ ] Implement and document support for basic auth
+-   [ ] Document `willSendRequest` and `reponseTransformer`
+-   [ ] Library architectural design (+ diagram?)
