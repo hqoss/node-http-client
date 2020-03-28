@@ -20,7 +20,7 @@ A light-weight, performant, composable blueprint for writing **consistent _and_ 
     -   [Intercepting requests](#intercepting-requests)
     -   [Transforming responses](#transforming-responses)
 
--   [🤤 Performance](#-performance)
+-   [⚡️ Performance](#-performance)
 
 -   [🧬 Core design principles](#-core-design-principles)
 
@@ -204,7 +204,7 @@ const organisationDetails = gitHubClient.getOrganisationDetails()
   .catch(console.error);
 ```
 
-## 🤤 Performance
+## ⚡️ Performance
 
 We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which may lead to a huge increase in throughput.
 
