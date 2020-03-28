@@ -5,23 +5,35 @@
 
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
-## Legend
+## Table of contents
 
 -   [🤔 Why use `agent`?](#-why-use-agent)
+
 -   [⏳ Install](#-install)
--   [📝 Usage](#usage)
+
+-   [📝 Usage](#-usage)
+
     -   [Basic](#basic)
     -   [Intercepting requests](#intercepting-requests)
     -   [Transforming responses](#transforming-responses)
--   [🤤 Performance](#-performance)
--   [🧬 Core design principles](#-core-design-principles)
--   [🧐 Why TypeScript?](#-why-typescript)
-    -   [Technical excellence and agile ways of working](#technical-excellence-and-agile-ways-of-working)
-    -   [Encourage Best Practices](#encourage-best-practices)
--   [🤩 Node version support](#-node-version-support)
+
+-   [🤤 Performance](#🤤-performance)
+
+    -   [Default `request` setup (used by _most_ projects):](#default-request-setup-used-by-most-projects)
+    -   [Default `node-fetch` setup (used by _many_ projects):](#default-node-fetch-setup-used-by-many-projects)
+    -   [Default `agent` setup:](#default-agent-setup)
+
+-   [🧬 Core design principles](#🧬-core-design-principles)
+
+-   [🧐 Why TypeScript?](#🧐-why-typescript)
+
+-   [🤩 Node version support](#🤩-node-version-support)
+
     -   [Why ES2018?](#why-es2018)
--   [❤️ Testing](#-testing)
--   [🤯 TODO](#-todo)
+
+-   [❤️ Testing](#️-testing)
+
+-   [🤯 TODO](#🤯-todo)
 
 ## 🤔 Why use `agent`?
 
