@@ -16,9 +16,8 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 -   [📝 Usage](#-usage)
 
-    -   [A simple HTTP client](#a-simple-http-client)
-
--   [API](#api)
+    -   [SDK-like HTTP client](#sdk-like-http-client)
+    -   [API Docs](#api-docs)
 
 -   [⚡️ Performance](#️-performance)
 
@@ -65,7 +64,9 @@ npm install @types/node-fetch --save-dev
 
 ## 📝 Usage
 
-### A simple HTTP client
+### SDK-like HTTP client
+
+Let's take a look at how we build a simple SDK-like HTTP Client.
 
 ```typescript
 import { HttpClient, Header, RequestInterceptor, ResponseTransformer } from "@asri/agent";
@@ -124,21 +125,23 @@ class GitHubClient extends HttpClient {
 export default GitHubClient;
 ```
 
+Then, in your application(s):
+
 ```typescript
 // Initiate the client.
 const gitHub = new GitHubClient();
 
-// Use pre-configured APIs to perform actions.
+// Use clean pre-configured APIs to perform actions.
 const { id } = await gitHub.createIssue({ ownerId: "foo", repoId: "bar", title: "New bug!" });
 
 const { id: orgId, name: orgName } = await gitHub.getOrganisationById("foobar");
 ```
 
-## API
-
-**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
+### API Docs
 
 [See full API Documentation here](docs/globals.md).
+
+**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
 
 ## ⚡️ Performance
 
