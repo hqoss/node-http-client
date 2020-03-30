@@ -1,8 +1,8 @@
-![Node.js CI](https://github.com/hqoss/node-agent/workflows/Node.js%20CI/badge.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-agent?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-agent&utm_campaign=Badge_Coverage)
+![Node.js CI](https://github.com/hqoss/node-http-client/workflows/Node.js%20CI/badge.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Coverage)
 
-# 🔌 Node Agent
+# 🔌 Node Http Client
 
 A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
@@ -10,7 +10,7 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 ## Table of contents
 
--   [🤔 Why use `agent`](#-why-use-agent)
+-   [🤔 Why use `http-client`](#-why-use-http-client)
 
 -   [⏳ Install](#-install)
 
@@ -31,14 +31,14 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 -   [TODO](#todo)
 
-## 🤔 Why use `agent`
+## 🤔 Why use `http-client`
 
 ... as opposed to `request` or `node-fetch`?
 
 -   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
 -   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
 
-**`agent` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.**
+**`http-client` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.**
 
 -   Enforces a consistent approach to writing HTTP clients.
 
@@ -57,7 +57,7 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 **⚠️ NOTE:** The project is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more in the [Node version support](#node-version-support) section.
 
 ```bash
-npm install @hqoss/agent
+npm install @hqoss/http-client
 # Additionally, for TypeScript users
 npm install @types/node-fetch --save-dev
 ```
@@ -69,7 +69,7 @@ npm install @types/node-fetch --save-dev
 Let's take a look at how we build a simple SDK-like HTTP Client.
 
 ```typescript
-import { HttpClient, Header, RequestInterceptor, ResponseTransformer } from "@asri/agent";
+import { HttpClient, Header, RequestInterceptor, ResponseTransformer } from "@hqoss/http-client";
 
 import type { CreateIssueArgs } from "./types";
 
@@ -141,19 +141,19 @@ const { id: orgId, name: orgName } = await gitHub.getOrganisationById("foobar");
 
 [See full API Documentation here](docs/globals.md).
 
-**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see example above).
+**⚠️ WARNING:** Unlike `request`, `http-client` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see example above).
 
 ## ⚡️ Performance
 
 We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which may lead to a huge increase in throughput.
 
-For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from one service to another (see diagram below), these were the results:
+For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `http-client` clients. To fetch a list of 100 users from one service to another (see diagram below), these were the results:
 
     | wrk | -HTTP-> | Server A -> HttpClient | -HTTP-> | Server B -> data in memory |
 
 -   Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
 -   Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
--   Default `agent` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
+-   Default `http-client` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
 
 Please note that these benchmarks were run through `wrk`, each lasting 30 seconds, using 5 threads and keeping 500 connections open.
 

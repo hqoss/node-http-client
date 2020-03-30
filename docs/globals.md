@@ -1,6 +1,6 @@
-[@hqoss/agent](README.md) › [Globals](globals.md)
+[@hqoss/http-client](README.md) › [Globals](globals.md)
 
-# @hqoss/agent
+# @hqoss/http-client
 
 ## Index
 
@@ -30,7 +30,7 @@
 
 Ƭ **HttpClientInitOpts**: *object*
 
-*Defined in [httpClient/types.ts:10](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/types.ts#L10)*
+*Defined in [httpClient/types.ts:10](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L10)*
 
 #### Type declaration:
 
@@ -48,7 +48,7 @@ ___
 
 Ƭ **RequestInterceptor**: *function*
 
-*Defined in [httpClient/types.ts:3](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/types.ts#L3)*
+*Defined in [httpClient/types.ts:3](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L3)*
 
 #### Type declaration:
 
@@ -67,7 +67,7 @@ ___
 
 Ƭ **ResponseTransformer**: *function*
 
-*Defined in [httpClient/types.ts:8](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/types.ts#L8)*
+*Defined in [httpClient/types.ts:8](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L8)*
 
 #### Type declaration:
 
@@ -85,7 +85,7 @@ Name | Type |
 
 ▸ **identityResponseTransformer**(`response`: Response‹›): *Response‹›*
 
-*Defined in [httpClient/identityResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/identityResponseTransformer.ts#L3)*
+*Defined in [httpClient/identityResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/identityResponseTransformer.ts#L3)*
 
 **Parameters:**
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **jsonResponseTransformer**(`response`: Response‹›): *Promise‹any›*
 
-*Defined in [httpClient/jsonResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/jsonResponseTransformer.ts#L3)*
+*Defined in [httpClient/jsonResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/jsonResponseTransformer.ts#L3)*
 
 **Parameters:**
 

@@ -1,4 +1,4 @@
-[@hqoss/agent](../README.md) › [Globals](../globals.md) › [HttpClient](httpclient.md)
+[@hqoss/http-client](../README.md) › [Globals](../globals.md) › [HttpClient](httpclient.md)
 
 # Class: HttpClient
 
@@ -35,7 +35,7 @@
 
 \+ **new HttpClient**(`__namedParameters`: object): *[HttpClient](httpclient.md)*
 
-*Defined in [httpClient/httpClient.ts:24](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L24)*
+*Defined in [httpClient/httpClient.ts:24](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L24)*
 
 **Parameters:**
 
@@ -56,7 +56,7 @@ Name | Type |
 
 • **baseHeaders**: *Record‹string, string›*
 
-*Defined in [httpClient/httpClient.ts:19](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L19)*
+*Defined in [httpClient/httpClient.ts:19](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L19)*
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 • **baseOptions**: *Omit‹RequestInit, "headers"›*
 
-*Defined in [httpClient/httpClient.ts:20](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L20)*
+*Defined in [httpClient/httpClient.ts:20](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L20)*
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 • **baseUrl**: *string*
 
-*Defined in [httpClient/httpClient.ts:18](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L18)*
+*Defined in [httpClient/httpClient.ts:18](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L18)*
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 • **transformResponse**: *[ResponseTransformer](../globals.md#responsetransformer)*
 
-*Defined in [httpClient/httpClient.ts:23](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L23)*
+*Defined in [httpClient/httpClient.ts:23](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L23)*
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 • **useJson**: *boolean*
 
-*Defined in [httpClient/httpClient.ts:21](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L21)*
+*Defined in [httpClient/httpClient.ts:21](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L21)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 • **willSendRequest**? : *[RequestInterceptor](../globals.md#requestinterceptor)*
 
-*Defined in [httpClient/httpClient.ts:24](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L24)*
+*Defined in [httpClient/httpClient.ts:24](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L24)*
 
 ## Methods
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **delete**<**T**>(`url`: string, `req`: RequestInit): *Promise‹T›*
 
-*Defined in [httpClient/httpClient.ts:132](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L132)*
+*Defined in [httpClient/httpClient.ts:132](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L132)*
 
 **Type parameters:**
 
@@ -125,7 +125,7 @@ ___
 
 ▸ **get**<**T**>(`url`: string, `req`: RequestInit): *Promise‹T›*
 
-*Defined in [httpClient/httpClient.ts:64](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L64)*
+*Defined in [httpClient/httpClient.ts:64](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L64)*
 
 **Type parameters:**
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **patch**<**T**>(`url`: string, `body?`: any, `req`: RequestInit): *Promise‹T›*
 
-*Defined in [httpClient/httpClient.ts:114](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L114)*
+*Defined in [httpClient/httpClient.ts:114](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L114)*
 
 **Type parameters:**
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **post**<**T**>(`url`: string, `body?`: any, `req`: RequestInit): *Promise‹T›*
 
-*Defined in [httpClient/httpClient.ts:78](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L78)*
+*Defined in [httpClient/httpClient.ts:78](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L78)*
 
 **Type parameters:**
 
@@ -190,7 +190,7 @@ ___
 
 ▸ **put**<**T**>(`url`: string, `body?`: any, `req`: RequestInit): *Promise‹T›*
 
-*Defined in [httpClient/httpClient.ts:96](https://github.com/hqoss/node-agent/blob/6204dd6/src/httpClient/httpClient.ts#L96)*
+*Defined in [httpClient/httpClient.ts:96](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/httpClient.ts#L96)*
 
 **Type parameters:**
 
