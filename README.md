@@ -153,13 +153,13 @@ import {
   RequestInterceptor,
   ResponseTransformer,
 } from "@hqoss/http-client";
-
+import type { PinoLogger } from "@hqoss/logger";
 import { pick } from "lodash";
 
-import { Logger, BaseRequestContext } from "../types";
+import { BaseRequestContext } from "../types";
 
 class UsersService extends HttpClient {
-  private readonly log: Logger;
+  private readonly log: PinoLogger;
 
   // Suppose each incoming request (from outside) creates and maintains
   // its unique context which carries its own instance of a logger,
@@ -210,7 +210,10 @@ class UsersService extends HttpClient {
 Then, we make sure we construct our client(s) and pass in a unique logger instance with the correct correlation id passed in as metadata. We can simply attach the resulting context to the request object itself, making it available in all subsequent request handlers.
 
 ```typescript
-import { Logger } from "@hqoss/logger";
+import { PinoLogger } from "@hqoss/logger";
+
+import { UsersService } from "./httpClients";
+import type { BaseRequestContext, RequestContext } from "./types";
 
 // ... initialise express, basic middleware etc.
 
@@ -226,7 +229,7 @@ app.use((req, res, next) => {
 
   // Initialise the logger, each log within this request will
   // carry the same correlaiton id to make tracing easy.
-  const log = new Logger({ correlationId });
+  const log = new PinoLogger({ correlationId });
 
   // Construct base request context.
   const baseCtx: BaseRequestContext = {
@@ -260,9 +263,9 @@ app.use((req, res, next) => {
 Finally, we can use our client(s) in the handlers through accessing `ctx`.
 
 ```typescript
-import { Request } from "express";
+import type { Request } from "express";
 
-import { RequestContext } from "../types";
+import type { RequestContext } from "../types";
 
 app.get("/users/:userId", async (req, res, next) => {
   const {
