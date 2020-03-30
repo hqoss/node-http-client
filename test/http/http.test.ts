@@ -6,7 +6,7 @@ import urlJoin from "url-join";
 
 import { HttpClient, jsonResponseTransformer } from "../../src/httpClient";
 import {
-  HeaderKey,
+  Header,
   HttpMethod,
   RequestInterceptor,
   ResponseTransformer,
@@ -78,14 +78,14 @@ describe("HttpClient", () => {
       const httpClient = new HttpClient({
         baseUrl,
         baseHeaders: {
-          [HeaderKey.Authorization]: "Bearer token",
-          [HeaderKey.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
+          [Header.Authorization]: "Bearer token",
+          [Header.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
         },
       });
 
       const url = "/200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
+        [Header.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
       };
 
       const expectedReply = "OK";
@@ -93,15 +93,12 @@ describe("HttpClient", () => {
       scope
         .get(url)
         .matchHeader(
-          HeaderKey.Authorization,
-          httpClient.baseHeaders[HeaderKey.Authorization],
+          Header.Authorization,
+          httpClient.baseHeaders[Header.Authorization],
         )
         // Ensures the request-specific x-correlation-id will take precedence
         // over the one in baseHeaders.
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(200, expectedReply);
 
       const response = await httpClient.get<Response>(url, {
@@ -119,7 +116,7 @@ describe("HttpClient", () => {
 
       const url = "/200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "91b20c71-f770-48dd-aa14-c6a87afb3dc5",
+        [Header.CorrelationId]: "91b20c71-f770-48dd-aa14-c6a87afb3dc5",
       };
 
       const expectedReply = {
@@ -129,12 +126,9 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.get(url, { headers: requestHeaders });
@@ -149,10 +143,10 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(204, undefined, {
-          [HeaderKey.ContentType]: "application/json",
+          [Header.ContentType]: "application/json",
         });
 
       const response = await httpClient.get(url);
@@ -165,7 +159,7 @@ describe("HttpClient", () => {
 
       const url = "/400";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "f7ca3270-572d-4742-871f-9c7e6482d1df",
+        [Header.CorrelationId]: "f7ca3270-572d-4742-871f-9c7e6482d1df",
       };
 
       const expectedReply = {
@@ -175,12 +169,9 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.get(url, { headers: requestHeaders });
@@ -200,8 +191,8 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(200, expectedReply);
 
       try {
@@ -229,7 +220,7 @@ describe("HttpClient", () => {
           args.request = request;
 
           Object.assign(request.headers, {
-            [HeaderKey.UserAgent]: "TestHttpClient",
+            [Header.UserAgent]: "TestHttpClient",
           });
         };
       }
@@ -248,7 +239,7 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .matchHeader(Header.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
       await httpClient.get(url);
@@ -256,7 +247,7 @@ describe("HttpClient", () => {
       expect(args.url).toEqual(urlJoin(baseUrl, url));
       expect(args.request).toMatchObject({
         headers: {
-          [HeaderKey.UserAgent]: "TestHttpClient",
+          [Header.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Get,
         timeout: 750,
@@ -293,8 +284,8 @@ describe("HttpClient", () => {
 
       scope
         .get(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply);
 
       try {
@@ -326,14 +317,14 @@ describe("HttpClient", () => {
       const httpClient = new HttpClient({
         baseUrl,
         baseHeaders: {
-          [HeaderKey.Authorization]: "Bearer token",
-          [HeaderKey.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
+          [Header.Authorization]: "Bearer token",
+          [Header.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
         },
       });
 
       const url = "/post-and-reply-with-200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
+        [Header.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
       };
       const requestBody = new URLSearchParams({ foo: "bar" });
 
@@ -342,15 +333,12 @@ describe("HttpClient", () => {
       scope
         .post(url, requestBody.toString())
         .matchHeader(
-          HeaderKey.Authorization,
-          httpClient.baseHeaders[HeaderKey.Authorization],
+          Header.Authorization,
+          httpClient.baseHeaders[Header.Authorization],
         )
         // Ensures the request-specific x-correlation-id will take precedence
         // over the one in baseHeaders.
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(202, expectedReply);
 
       const response = await httpClient.post<Response>(url, requestBody, {
@@ -368,7 +356,7 @@ describe("HttpClient", () => {
 
       const url = "/post-and-reply-with-200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "91b20c71-f770-48dd-aa14-c6a87afb3dc5",
+        [Header.CorrelationId]: "91b20c71-f770-48dd-aa14-c6a87afb3dc5",
       };
       const requestBody = { foo: "bar" };
 
@@ -379,12 +367,9 @@ describe("HttpClient", () => {
 
       scope
         .post(url, requestBody)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.post(url, requestBody, {
@@ -408,8 +393,8 @@ describe("HttpClient", () => {
 
       scope
         .post(url, requestBodyOverride)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.post(url, requestBody, {
@@ -434,7 +419,7 @@ describe("HttpClient", () => {
           args.request = request;
 
           Object.assign(request.headers, {
-            [HeaderKey.UserAgent]: "TestHttpClient",
+            [Header.UserAgent]: "TestHttpClient",
           });
         };
       }
@@ -453,7 +438,7 @@ describe("HttpClient", () => {
 
       scope
         .post(url)
-        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .matchHeader(Header.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
       await httpClient.post(url);
@@ -461,7 +446,7 @@ describe("HttpClient", () => {
       expect(args.url).toEqual(urlJoin(baseUrl, url));
       expect(args.request).toMatchObject({
         headers: {
-          [HeaderKey.UserAgent]: "TestHttpClient",
+          [Header.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Post,
         timeout: 750,
@@ -480,12 +465,12 @@ describe("HttpClient", () => {
 
       scope
         .post(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply)
         .post(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply);
 
       const responseWithNullBody = await httpClient.post(url, null);
@@ -517,14 +502,14 @@ describe("HttpClient", () => {
       const httpClient = new HttpClient({
         baseUrl,
         baseHeaders: {
-          [HeaderKey.Authorization]: "Bearer token",
-          [HeaderKey.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
+          [Header.Authorization]: "Bearer token",
+          [Header.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
         },
       });
 
       const url = "/put-and-reply-with-200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
+        [Header.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
       };
       const requestBody = new URLSearchParams({ foo: "bar" });
 
@@ -533,15 +518,12 @@ describe("HttpClient", () => {
       scope
         .put(url, requestBody.toString())
         .matchHeader(
-          HeaderKey.Authorization,
-          httpClient.baseHeaders[HeaderKey.Authorization],
+          Header.Authorization,
+          httpClient.baseHeaders[Header.Authorization],
         )
         // Ensures the request-specific x-correlation-id will take precedence
         // over the one in baseHeaders.
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(202, expectedReply);
 
       const response = await httpClient.put<Response>(url, requestBody, {
@@ -567,7 +549,7 @@ describe("HttpClient", () => {
           args.request = request;
 
           Object.assign(request.headers, {
-            [HeaderKey.UserAgent]: "TestHttpClient",
+            [Header.UserAgent]: "TestHttpClient",
           });
         };
       }
@@ -586,7 +568,7 @@ describe("HttpClient", () => {
 
       scope
         .put(url)
-        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .matchHeader(Header.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
       await httpClient.put(url);
@@ -594,7 +576,7 @@ describe("HttpClient", () => {
       expect(args.url).toEqual(urlJoin(baseUrl, url));
       expect(args.request).toMatchObject({
         headers: {
-          [HeaderKey.UserAgent]: "TestHttpClient",
+          [Header.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Put,
         timeout: 750,
@@ -614,16 +596,16 @@ describe("HttpClient", () => {
 
       scope
         .put(url, requestBody)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply)
         .put(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply)
         .put(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.put(url, requestBody);
@@ -658,14 +640,14 @@ describe("HttpClient", () => {
       const httpClient = new HttpClient({
         baseUrl,
         baseHeaders: {
-          [HeaderKey.Authorization]: "Bearer token",
-          [HeaderKey.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
+          [Header.Authorization]: "Bearer token",
+          [Header.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
         },
       });
 
       const url = "/patch-and-reply-with-200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
+        [Header.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
       };
       const requestBody = new URLSearchParams({ foo: "bar" });
 
@@ -674,15 +656,12 @@ describe("HttpClient", () => {
       scope
         .patch(url, requestBody.toString())
         .matchHeader(
-          HeaderKey.Authorization,
-          httpClient.baseHeaders[HeaderKey.Authorization],
+          Header.Authorization,
+          httpClient.baseHeaders[Header.Authorization],
         )
         // Ensures the request-specific x-correlation-id will take precedence
         // over the one in baseHeaders.
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(202, expectedReply);
 
       const response = await httpClient.patch<Response>(url, requestBody, {
@@ -708,7 +687,7 @@ describe("HttpClient", () => {
           args.request = request;
 
           Object.assign(request.headers, {
-            [HeaderKey.UserAgent]: "TestHttpClient",
+            [Header.UserAgent]: "TestHttpClient",
           });
         };
       }
@@ -727,7 +706,7 @@ describe("HttpClient", () => {
 
       scope
         .patch(url)
-        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .matchHeader(Header.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
       await httpClient.patch(url);
@@ -735,7 +714,7 @@ describe("HttpClient", () => {
       expect(args.url).toEqual(urlJoin(baseUrl, url));
       expect(args.request).toMatchObject({
         headers: {
-          [HeaderKey.UserAgent]: "TestHttpClient",
+          [Header.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Patch,
         timeout: 750,
@@ -755,16 +734,16 @@ describe("HttpClient", () => {
 
       scope
         .patch(url, requestBody)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply)
         .patch(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply)
         .patch(url)
-        .matchHeader(HeaderKey.Accept, "application/json")
-        .matchHeader(HeaderKey.ContentType, "application/json")
+        .matchHeader(Header.Accept, "application/json")
+        .matchHeader(Header.ContentType, "application/json")
         .reply(expectedReply.code, expectedReply);
 
       const response = await httpClient.patch(url, requestBody);
@@ -799,14 +778,14 @@ describe("HttpClient", () => {
       const httpClient = new HttpClient({
         baseUrl,
         baseHeaders: {
-          [HeaderKey.Authorization]: "Bearer token",
-          [HeaderKey.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
+          [Header.Authorization]: "Bearer token",
+          [Header.CorrelationId]: "29bf6cc3-531c-40ed-9633-dc235a7f12ba",
         },
       });
 
       const url = "/delete-and-reply-with-200";
       const requestHeaders = {
-        [HeaderKey.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
+        [Header.CorrelationId]: "291d2954-982d-4e36-a6f1-67dcec088a5f",
       };
       const requestBody = new URLSearchParams({ foo: "bar" });
 
@@ -815,15 +794,12 @@ describe("HttpClient", () => {
       scope
         .delete(url, requestBody.toString())
         .matchHeader(
-          HeaderKey.Authorization,
-          httpClient.baseHeaders[HeaderKey.Authorization],
+          Header.Authorization,
+          httpClient.baseHeaders[Header.Authorization],
         )
         // Ensures the request-specific x-correlation-id will take precedence
         // over the one in baseHeaders.
-        .matchHeader(
-          HeaderKey.CorrelationId,
-          requestHeaders[HeaderKey.CorrelationId],
-        )
+        .matchHeader(Header.CorrelationId, requestHeaders[Header.CorrelationId])
         .reply(202, expectedReply);
 
       const response = await httpClient.delete<Response>(url, {
@@ -850,7 +826,7 @@ describe("HttpClient", () => {
           args.request = request;
 
           Object.assign(request.headers, {
-            [HeaderKey.UserAgent]: "TestHttpClient",
+            [Header.UserAgent]: "TestHttpClient",
           });
         };
       }
@@ -869,7 +845,7 @@ describe("HttpClient", () => {
 
       scope
         .delete(url)
-        .matchHeader(HeaderKey.UserAgent, "TestHttpClient")
+        .matchHeader(Header.UserAgent, "TestHttpClient")
         .reply(expectedReply.code, expectedReply);
 
       await httpClient.delete(url);
@@ -877,7 +853,7 @@ describe("HttpClient", () => {
       expect(args.url).toEqual(urlJoin(baseUrl, url));
       expect(args.request).toMatchObject({
         headers: {
-          [HeaderKey.UserAgent]: "TestHttpClient",
+          [Header.UserAgent]: "TestHttpClient",
         },
         method: HttpMethod.Delete,
         timeout: 750,

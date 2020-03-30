@@ -1,8 +1,8 @@
-import { ResponseTransformer, HeaderKey } from "./types";
+import { ResponseTransformer, Header } from "./types";
 
 const jsonResponseTransformer: ResponseTransformer = (response) => {
-  const contentType = response.headers.get(HeaderKey.ContentType);
-  const contentLength = response.headers.get(HeaderKey.ContentLength);
+  const contentType = response.headers.get(Header.ContentType);
+  const contentLength = response.headers.get(Header.ContentLength);
 
   if (
     contentType?.startsWith("application/json") &&

@@ -7,7 +7,7 @@ import identityResponseTransformer from "./identityResponseTransformer";
 import jsonResponseTransformer from "./jsonResponseTransformer";
 
 import {
-  HeaderKey,
+  Header,
   HttpClientInitOpts,
   HttpMethod,
   RequestInterceptor,
@@ -37,8 +37,8 @@ class HttpClient {
 
     const jsonHeaders = useJson
       ? {
-          [HeaderKey.Accept]: "application/json",
-          [HeaderKey.ContentType]: "application/json",
+          [Header.Accept]: "application/json",
+          [Header.ContentType]: "application/json",
         }
       : undefined;
 

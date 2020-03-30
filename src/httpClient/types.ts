@@ -14,7 +14,7 @@ export type HttpClientInitOpts = {
   json?: boolean;
 };
 
-export enum HeaderKey {
+export enum Header {
   Authorization = "authorization",
   Accept = "accept",
   ContentLength = "content-length",

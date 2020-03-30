@@ -16,11 +16,11 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 -   [📝 Usage](#-usage)
 
-    -   [Basic](#basic)
-    -   [Intercepting requests](#intercepting-requests)
-    -   [Transforming responses](#transforming-responses)
+    -   [A simple HTTP client](#a-simple-http-client)
 
--   [⚡️ Performance](#-performance)
+-   [API](#api)
+
+-   [⚡️ Performance](#️-performance)
 
 -   [🧬 Core design principles](#-core-design-principles)
 
@@ -28,7 +28,7 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
     -   [Why ES2018](#why-es2018)
 
--   [❤️ Testing](#️-testing)
+-   [Testing](#testing)
 
 -   [TODO](#todo)
 
@@ -65,108 +65,30 @@ npm install @types/node-fetch --save-dev
 
 ## 📝 Usage
 
-**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
-
-### Basic
-
-Define:
+### A simple HTTP client
 
 ```typescript
-import { HttpClient } from "@asri/agent";
+import { HttpClient, Header, RequestInterceptor, ResponseTransformer } from "@asri/agent";
+
+import type { CreateIssueArgs } from "./types";
 
 class GitHubClient extends HttpClient {
   constructor() {
     super({
       baseUrl: "https://api.github.com/",
-      baseHeaders: { "accept": "application/vnd.github.v3+json" },
-      // Set any `node-fetch` supported `Request` options.
-      // Note that headers MUST be set in `baseHeaders`.
-      baseOptions: { timeout: 5000 },
+      baseHeaders: { [Header.Authorization]: `token ${process.env.GITHUB_TOKEN}` },
+      baseOptions: { timeout: 2500 },
       // Automatically includes `accept: application/json` and 
       // `content-type: application/json` headers and parses responses to json.
-      // It will also use the default `jsonResponseTransformer`
-      // to parse responses into json. Does NOT reject non-ok responses.
       json: true,
     });
   }
-
-  // Expose pre-configured, provider-specific methods to your consumers / API users.
-  getOrganisationDetails = (orgId: string) => this.get(`/orgs/${orgId}`);
-
-  getOrganisationRepositories = (orgId: string) => this.get(`/orgs/${orgId}/repos`, { timeout: 2500 });
-}
-
-export default GitHubClient;
-```
-
-Consume:
-
-```typescript
-// Suppose you have a shared library for Http clients.
-import { GitHubClient } from "@clients/github";
-
-// You can also use the client's constructor to provide additional configuration here.
-const gitHubClient = new GitHubClient();
-
-// Resulting headers:
-// `accept: application/vnd.github.v3+json` -> provided in `baseHeaders`
-// `content-type: application/json` -> set internally due to `json: true`.
-// Will warn because there is no `x-correlation-id` header set.
-// Will use `timeout: 5000` as defined in `baseOptions`.
-const organisationDetails = await gitHubClient.getOrganisationDetails();
-
-// Same as above, but uses `timeout: 2500` – see `getOrganisationRepositories` implementation.
-const organisationRepositories = await gitHubClient.getOrganisationRepositories();
-```
-
-### Intercepting requests
-
-You can intercept every request by implementing the `willSendRequest` lifecycle method.
-
-```typescript
-import { HeaderKey, HttpClient, RequestInterceptor } from "@asri/agent";
-
-class GitHubClient extends HttpClient {
-  constructor() {
-    super({
-      baseUrl: "https://api.github.com/",
-      baseHeaders: { "accept": "application/vnd.github.v3+json" },
-      json: true,
-    });
-  }
-
-  private static correlationIdHeader = HeaderKey.CorrelationId;
 
   // Inspired by Apollo's REST Data Source, this lifecycle method
   // can be used to perform useful actions before a request is sent.
-  protected willSendRequest: RequestInterceptor = (url, { headers }) => {
-    const { correlationIdHeader } = HttpStatClient;
-
+  protected willSendRequest: RequestInterceptor = (url, _request) => {
     console.info(`Outgoing request to ${url}`);
-
-    if (!(correlationIdHeader in headers)) {
-      console.warn(`missing ${correlationIdHeader} header`);
-    };
-  }
-
-  // ... pre-configured methods follow.
-}
-
-export default GitHubClient;
-```
-
-### Transforming responses
-
-There is a great deal of discussion on whether `fetch` should or should not reject non-ok responses \[[1](https://github.com/whatwg/fetch/issues/18),[2](https://github.com/github/fetch/issues/155)].
-We believe such design choices should ultimately be made by the consumers, so the `HttpClient` base class exposes a convenient mechanism to transform responses via the `transformResponse` method.
-
-```typescript
-import { HttpClient, ResponseTransformer } from "@asri/agent";
-
-class GitHubClient extends HttpClient {
-  constructor() {
-    super({ baseUrl: "https://api.github.com/", json: true });
-  }
+  };
 
   // Mmimics the default behaviour of request, e.g. non-ok responses
   // are rejected rather than resolved.
@@ -182,27 +104,41 @@ class GitHubClient extends HttpClient {
     }
   };
 
-  // ... pre-configured methods follow.
+  // See https://developer.github.com/v3/issues/#create-an-issue.
+  createIssue = ({ ownerId, repoId, ...args }: CreateIssueArgs) =>
+    this.post<{ id: string; }>(
+      `/repos/${ownerId}/${repoId}/issues`,
+      args,
+      { timeout: 5000 },
+    );
+
+  // See https://developer.github.com/v3/orgs/#get-an-organization.
+  getOrganisationById = (organisationId: string) =>
+    this.get<{ id: string; name: string; /* ... and more. */ }>(
+      `/orgs/${organisationId}`,
+      { headers: { [Header.Accept]: "application/vnd.github.surtur-preview+json" } }
+    )
+
 }
 
 export default GitHubClient;
 ```
 
-Consume:
-
 ```typescript
-// Suppose you have a shared library for Http clients.
-import { GitHubClient } from "@clients/github";
+// Initiate the client.
+const gitHub = new GitHubClient();
 
-// You can also use the client's constructor to provide additional configuration here.
-const gitHubClient = new GitHubClient();
+// Use pre-configured APIs to perform actions.
+const { id } = await gitHub.createIssue({ ownerId: "foo", repoId: "bar", title: "New bug!" });
 
-// Non-ok responses, for example 404, will now reject.
-const organisationDetails = gitHubClient.getOrganisationDetails()
-  .then(console.log)
-  // A non-ok response will now end up here.
-  .catch(console.error);
+const { id: orgId, name: orgName } = await gitHub.getOrganisationById("foobar");
 ```
+
+## API
+
+**⚠️ WARNING:** Unlike `request`, `agent` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see [Transforming responses](#transforming-responses)).
+
+[See full API Documentation here](docs/globals.md).
 
 ## ⚡️ Performance
 
@@ -210,9 +146,7 @@ We ship the default `HttpClient` with a pre-configured (Node.js) `Agent`, which 
 
 For reference, we performed a number of benchmarks comparing the out-of-the-box `request`, `node-fetch`, and `agent` clients. To fetch a list of 100 users from one service to another (see diagram below), these were the results:
 
-```
-| wrk | -HTTP-> | Server A -> HttpClient | -HTTP-> | Server B -> data in memory |
-```
+    | wrk | -HTTP-> | Server A -> HttpClient | -HTTP-> | Server B -> data in memory |
 
 -   Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
 -   Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
@@ -254,7 +188,7 @@ From the release notes:
 
 > We are turning on the --async-stack-traces flag by default. Zero-cost async stack traces make it easier to diagnose problems in production with heavily asynchronous code, as the error.stack property that is usually sent to log files/services now provides more insight into what caused the problem.
 
-## ❤️ Testing
+## Testing
 
 [Ava](https://github.com/avajs/ava) and [Jest](https://jestjs.io/) were considered. Jest was chosen as it is very easy to configure and includes most of the features we need out-of-the-box.
 
