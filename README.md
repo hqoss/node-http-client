@@ -17,6 +17,8 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 -   [📝 Usage](#-usage)
 
     -   [SDK-like HTTP client](#sdk-like-http-client)
+    -   [Advanced example](#advanced-example)
+    -   [Gotchas and useful know-how](#gotchas-and-useful-know-how)
     -   [API Docs](#api-docs)
 
 -   [⚡️ Performance](#️-performance)
@@ -135,6 +137,193 @@ const gitHub = new GitHubClient();
 const { id } = await gitHub.createIssue({ ownerId: "foo", repoId: "bar", title: "New bug!" });
 
 const { id: orgId, name: orgName } = await gitHub.getOrganisationById("foobar");
+```
+
+### Advanced example
+
+When it comes to distributed systems, visibility is hugely important. We can leverage the SDK-like design approach further to ensure we maintain a consistent approach to logging, error handling, as well as code structure.
+
+First, let's hook up to the request lifecycle and log the events we care about.
+
+```typescript
+import {
+  Header,
+  HttpClient,
+  jsonResponseTransformer,
+  RequestInterceptor,
+  ResponseTransformer,
+} from "@hqoss/http-client";
+
+import { pick } from "lodash";
+
+import { Logger, BaseRequestContext } from "../types";
+
+class UsersService extends HttpClient {
+  private readonly log: Logger;
+
+  // Suppose each incoming request (from outside) creates and maintains
+  // its unique context which carries its own instance of a logger,
+  // the request headers, and other useful request data.
+  constructor({ log, headers }: BaseRequestContext) {
+    super({
+      baseUrl: "http://s-users/",
+      baseHeaders: pick(headers, [Header.Authorization, Header.IdToken, Header.CorrelationId]),
+      json: true,
+    });
+
+    this.log = log;
+  }
+
+  protected willSendRequest: RequestInterceptor = (url, request) => {
+    const { log } = this;
+    const { headers } = request;
+
+    log.debug(`Outgoing request to ${url}`);
+
+    if (!(Header.CorrelationId in headers)) {
+      log.warn(`Missing ${Header.CorrelationId} header`);
+    }
+  };
+
+  protected transformResponse: ResponseTransformer = async (response) => {
+    const { log } = this;
+    const { ok, status, statusText } = response;
+
+    const jsonResponse = await jsonResponseTransformer();
+
+    log.debug(`Received response ${status} ${statusText}`);
+
+    if (ok) {
+      return jsonResponse;
+    } else {
+      log.error(jsonResponse);
+
+      throw jsonResponse;
+    }
+  };
+
+  // ... define APIs as shown in previous examples.
+
+}
+```
+
+Then, we make sure we construct our client(s) and pass in a unique logger instance with the correct correlation id passed in as metadata. We can simply attach the resulting context to the request object itself, making it available in all subsequent request handlers.
+
+```typescript
+import { Logger } from "@hqoss/logger";
+
+// ... initialise express, basic middleware etc.
+
+// Build a unique context for every request.
+app.use((req, res, next) => {
+  const { headers } = req;
+
+  // Get or generate a request correlation id.
+  const correlationId = headers[Header.CorrelationId] || generateUUID();
+
+  // Always send the correlation id back to the client.
+  res.setHeader(Header.CorrelationId, correlationId);
+
+  // Initialise the logger, each log within this request will
+  // carry the same correlaiton id to make tracing easy.
+  const log = new Logger({ correlationId });
+
+  // Construct base request context.
+  const baseCtx: BaseRequestContext = {
+    correlationId,
+    headers,
+    log,
+  };
+
+  // Construct HTTP Clients.
+  const clients = {
+    users: new UsersService(baseCtx),
+    // ... define the rest here.
+  };
+
+  // Construct full request context and assign it to the request.
+  const ctx: RequestContext = {
+    ...baseCtx,
+    clients,
+    // ... add services, etc. here.
+  };
+
+  // Makes `ctx` available in all subsequent handlers.
+  Object.assign(req, { ctx });
+
+  next();
+});
+
+// ... other server setup, routing, etc.
+```
+
+Finally, we can use our client(s) in the handlers through accessing `ctx`.
+
+```typescript
+import { Request } from "express";
+
+import { RequestContext } from "../types";
+
+app.get("/users/:userId", async (req, res, next) => {
+  const {
+    ctx: { clients },
+    params: { userId },
+  } = req as Request & { ctx: RequestContext };
+
+  try {
+    const user = await clients.users.getUser(userId);
+
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+### Gotchas and useful know-how
+
+1.  `json` mode is _not_ the default. It needs to be enabled explicitly in the `constructor`.
+
+```typescript
+import { HttpClient } from "@hqoss/http-client";
+
+class UsersService extends HttpClient {
+  constructor() {
+    super({ baseUrl: "http://s-users/", json: true });
+  }
+}
+```
+
+2.  Non-ok responses are _not_ rejected by default. You can mimic this behaviour in the `transformResponse` lifecycle method.
+
+```typescript
+import { HttpClient, jsonResponseTransformer, ResponseTransformer } from "@hqoss/http-client";
+
+class UsersService extends HttpClient {
+  constructor() {
+    // You still need `json: true` to let the client know what request
+    // headers to configure.
+    super({ baseUrl: "http://s-users/", json: true });
+  }
+
+  // Mmimics the default behaviour of request, e.g. non-ok responses
+  // are rejected rather than resolved.
+  protected transformResponse: ResponseTransformer = async (response) => {
+    // You can also simply `await response.json()`, however that does not
+    // guarantee correctly handling 204 No Content responses.
+    const jsonResponse = await jsonResponseTransformer();
+
+    if (response.ok) {
+      return jsonResponse;
+    } else {
+      throw jsonResponse;
+    }
+  };
+}
 ```
 
 ### API Docs
