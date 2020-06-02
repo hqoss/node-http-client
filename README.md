@@ -2,6 +2,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Coverage)
 [![GuardRails badge](https://badges.guardrails.io/hqoss/node-http-client.svg?token=030dd9506fbf19af907d144a89e2973e05876de87f886a9df07e88581d6119fe&provider=github)](https://dashboard.guardrails.io/gh/hqoss/36608)
+![npm](https://img.shields.io/npm/v/@hqoss/http-client)
 
 # 🔌 Node Http Client
 
