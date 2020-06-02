@@ -5,7 +5,7 @@
 
 # 🔌 Node Http Client
 
-A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients
+A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
 
 Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
