@@ -20,7 +20,7 @@
 
 • **Accept**: = "accept"
 
-*Defined in [httpClient/types.ts:19](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L19)*
+*Defined in [httpClient/types.ts:19](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L19)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **Authorization**: = "authorization"
 
-*Defined in [httpClient/types.ts:18](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L18)*
+*Defined in [httpClient/types.ts:18](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L18)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **ContentLength**: = "content-length"
 
-*Defined in [httpClient/types.ts:20](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L20)*
+*Defined in [httpClient/types.ts:20](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L20)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **ContentType**: = "content-type"
 
-*Defined in [httpClient/types.ts:21](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L21)*
+*Defined in [httpClient/types.ts:21](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L21)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **CorrelationId**: = "x-correlation-id"
 
-*Defined in [httpClient/types.ts:22](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L22)*
+*Defined in [httpClient/types.ts:22](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L22)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • **IdToken**: = "x-id-token"
 
-*Defined in [httpClient/types.ts:23](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L23)*
+*Defined in [httpClient/types.ts:23](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L23)*
 
 ___
 
@@ -68,4 +68,4 @@ ___
 
 • **UserAgent**: = "user-agent"
 
-*Defined in [httpClient/types.ts:24](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L24)*
+*Defined in [httpClient/types.ts:24](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L24)*

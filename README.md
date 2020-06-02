@@ -1,10 +1,11 @@
 ![Node.js CI](https://github.com/hqoss/node-http-client/workflows/Node.js%20CI/badge.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Coverage)
+[![GuardRails badge](https://badges.guardrails.io/hqoss/node-http-client.svg?token=030dd9506fbf19af907d144a89e2973e05876de87f886a9df07e88581d6119fe&provider=github)](https://dashboard.guardrails.io/gh/hqoss/36608)
 
 # 🔌 Node Http Client
 
-A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
+A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients
 
 Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
@@ -23,7 +24,7 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 -   [⚡️ Performance](#️-performance)
 
--   [🧬 Core design principles](#-core-design-principles)
+-   [Core design principles](#core-design-principles)
 
 -   [Node version support](#node-version-support)
 
@@ -56,13 +57,13 @@ Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
 
 ## ⏳ Install
 
-**⚠️ NOTE:** The project is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more in the [Node version support](#node-version-support) section.
-
 ```bash
 npm install @hqoss/http-client
 # Additionally, for TypeScript users
 npm install @types/node-fetch --save-dev
 ```
+
+**⚠️ NOTE:** The project is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more in the [Node version support](#node-version-support) section.
 
 ## 📝 Usage
 
@@ -359,7 +360,7 @@ const opts = {
 };
 ```
 
-## 🧬 Core design principles
+## Core design principles
 
 -   **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
 

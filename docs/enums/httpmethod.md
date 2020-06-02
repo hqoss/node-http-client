@@ -18,7 +18,7 @@
 
 • **Delete**: = "delete"
 
-*Defined in [httpClient/types.ts:32](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L32)*
+*Defined in [httpClient/types.ts:32](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L32)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **Get**: = "get"
 
-*Defined in [httpClient/types.ts:28](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L28)*
+*Defined in [httpClient/types.ts:28](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L28)*
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **Patch**: = "patch"
 
-*Defined in [httpClient/types.ts:30](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L30)*
+*Defined in [httpClient/types.ts:30](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L30)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **Post**: = "post"
 
-*Defined in [httpClient/types.ts:29](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L29)*
+*Defined in [httpClient/types.ts:29](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L29)*
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 • **Put**: = "put"
 
-*Defined in [httpClient/types.ts:31](https://github.com/hqoss/node-agent/blob/0ea739e/src/httpClient/types.ts#L31)*
+*Defined in [httpClient/types.ts:31](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L31)*
