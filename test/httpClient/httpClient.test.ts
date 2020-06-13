@@ -4,13 +4,13 @@ import nock, { Scope } from "nock";
 import { FetchError, RequestInit, Response } from "node-fetch";
 import urlJoin from "url-join";
 
-import { HttpClient, jsonResponseTransformer } from "../../src/httpClient";
+import { HttpClient, jsonResponseTransformer } from "../../lib/httpClient";
 import {
   Header,
   HttpMethod,
   RequestInterceptor,
   ResponseTransformer,
-} from "../../src/httpClient/types";
+} from "../../lib/httpClient/types";
 
 describe("HttpClient", () => {
   const baseUrl = "http://httpstat.us/";
