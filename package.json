@@ -23,8 +23,7 @@
   "keywords": [
     "http",
     "https",
-    "fetch",
-    "node-fetch",
+    "request",
     "javascript",
     "js",
     "typescript",
