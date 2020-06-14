@@ -2,8 +2,8 @@
   "name": "@hqoss/http-client",
   "version": "0.1.0-0",
   "description": "A light-weight, performant, composable blueprint for writing consistent and re-usable Node.js HTTP clients",
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
+  "main": "./dist/lib/index.js",
+  "typings": "./dist/lib/index.d.ts",
   "engines": {
     "node": ">=12",
     "npm": ">=6"
