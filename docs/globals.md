@@ -6,41 +6,73 @@
 
 ### Enumerations
 
-* [Header](enums/header.md)
-* [HttpMethod](enums/httpmethod.md)
+* [Method](enums/method.md)
 
 ### Classes
 
+* [BufferHttpClient](classes/bufferhttpclient.md)
 * [HttpClient](classes/httpclient.md)
+* [JsonHttpClient](classes/jsonhttpclient.md)
 
 ### Type aliases
 
-* [HttpClientInitOpts](globals.md#httpclientinitopts)
+* [Consumable](globals.md#consumable)
+* [HttpClientOpts](globals.md#httpclientopts)
+* [HttpsClientOpts](globals.md#httpsclientopts)
 * [RequestInterceptor](globals.md#requestinterceptor)
 * [ResponseTransformer](globals.md#responsetransformer)
+* [TransformedResponse](globals.md#transformedresponse)
+
+### Variables
+
+* [echoServer](globals.md#const-echoserver)
+* [httpClient](globals.md#const-httpclient)
+* [port](globals.md#const-port)
+* [runner](globals.md#const-runner)
+* [tests](globals.md#const-tests)
 
 ### Functions
 
-* [identityResponseTransformer](globals.md#const-identityresponsetransformer)
+* [bufferResponseTransformer](globals.md#const-bufferresponsetransformer)
+* [isConsumable](globals.md#const-isconsumable)
 * [jsonResponseTransformer](globals.md#const-jsonresponsetransformer)
+* [readableToBuffer](globals.md#const-readabletobuffer)
 
 ## Type aliases
 
-###  HttpClientInitOpts
+###  Consumable
 
-Ƭ **HttpClientInitOpts**: *object*
+Ƭ **Consumable**: *Readable | Buffer | string*
 
-*Defined in [httpClient/types.ts:10](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L10)*
+*Defined in [lib/httpClient/types.ts:10](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L10)*
+
+___
+
+###  HttpClientOpts
+
+Ƭ **HttpClientOpts**: *object*
+
+*Defined in [lib/httpClient/types.ts:18](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L18)*
 
 #### Type declaration:
 
-* **baseHeaders**? : *Record‹string, string›*
-
-* **baseOptions**? : *Omit‹RequestInit, "headers"›*
+* **baseReqOpts**? : *HttpRequestOptions*
 
 * **baseUrl**: *string*
 
-* **json**? : *undefined | false | true*
+___
+
+###  HttpsClientOpts
+
+Ƭ **HttpsClientOpts**: *object*
+
+*Defined in [lib/httpClient/types.ts:23](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L23)*
+
+#### Type declaration:
+
+* **baseReqOpts**? : *HttpsRequestOptions*
+
+* **baseUrl**: *string*
 
 ___
 
@@ -48,18 +80,18 @@ ___
 
 Ƭ **RequestInterceptor**: *function*
 
-*Defined in [httpClient/types.ts:3](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L3)*
+*Defined in [lib/httpClient/types.ts:29](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L29)*
 
 #### Type declaration:
 
-▸ (`url`: string, `request`: RequestInit): *void | Promise‹void›*
+▸ (`url`: URL, `request`: ClientRequest): *void | Promise‹void›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`url` | string |
-`request` | RequestInit |
+`url` | URL |
+`request` | ClientRequest |
 
 ___
 
@@ -67,46 +99,160 @@ ___
 
 Ƭ **ResponseTransformer**: *function*
 
-*Defined in [httpClient/types.ts:8](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/types.ts#L8)*
+*Defined in [lib/httpClient/types.ts:35](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L35)*
 
 #### Type declaration:
 
-▸ (`res`: Response): *any*
+▸ (`response`: IncomingMessage): *T | Promise‹T›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`res` | Response |
+`response` | IncomingMessage |
+
+___
+
+###  TransformedResponse
+
+Ƭ **TransformedResponse**: *object*
+
+*Defined in [lib/httpClient/types.ts:39](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/types.ts#L39)*
+
+#### Type declaration:
+
+* **data**: *T*
+
+* **headers**: *IncomingHttpHeaders*
+
+* **statusCode**? : *undefined | number*
+
+* **statusMessage**? : *undefined | string*
+
+## Variables
+
+### `Const` echoServer
+
+• **echoServer**: *Server‹›* = createServer((req, res) => {
+  const [method, statusCode = "200"] = req.url
+    ? req.url.split("/").slice(1)
+    : ["get", "200"];
+
+  res.setHeader("x-method-ack", method.toLowerCase());
+  res.writeHead(parseInt(statusCode));
+
+  if (method === "get") {
+    res.end("ok");
+  } else {
+    req.pipe(res);
+  }
+}).listen(port, () => {
+  console.log(`Server listening on ${port}\n`);
+  runner.emit("init");
+})
+
+Defined in test/httpClient/httpClient.custom.test.ts:14
+
+*Defined in [test/httpClient/httpClient.test.ts:16](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L16)*
+
+___
+
+### `Const` httpClient
+
+• **httpClient**: *[HttpClient](classes/httpclient.md)‹IncomingMessage‹››* = new HttpClient({ baseUrl: `http://localhost:${port}/` })
+
+*Defined in [test/httpClient/httpClient.test.ts:34](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L34)*
+
+___
+
+### `Const` port
+
+• **port**: *3000* = 3000
+
+Defined in test/httpClient/httpClient.custom.test.ts:12
+
+*Defined in [test/httpClient/httpClient.test.ts:14](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L14)*
+
+___
+
+### `Const` runner
+
+• **runner**: *EventEmitter‹›* = new EventEmitter()
+
+Defined in test/httpClient/httpClient.custom.test.ts:10
+
+*Defined in [test/httpClient/httpClient.test.ts:12](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L12)*
+
+___
+
+### `Const` tests
+
+• **tests**: *Map‹any, any›* = new Map()
+
+Defined in test/httpClient/httpClient.custom.test.ts:55
+
+*Defined in [test/httpClient/httpClient.test.ts:36](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L36)*
 
 ## Functions
 
-### `Const` identityResponseTransformer
+### `Const` bufferResponseTransformer
 
-▸ **identityResponseTransformer**(`response`: Response‹›): *Response‹›*
+▸ **bufferResponseTransformer**(`response`: IncomingMessage‹›): *Promise‹object›*
 
-*Defined in [httpClient/identityResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/identityResponseTransformer.ts#L3)*
+Defined in lib/httpClient/bufferResponseTransformer.ts:7
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`response` | Response‹› |
+`response` | IncomingMessage‹› |
 
-**Returns:** *Response‹›*
+**Returns:** *Promise‹object›*
+
+___
+
+### `Const` isConsumable
+
+▸ **isConsumable**(`chunks`: [Consumable](globals.md#consumable)): *chunks is Consumable*
+
+*Defined in [lib/httpClient/httpClient.ts:100](https://github.com/hqoss/node-http-client/blob/d317187/lib/httpClient/httpClient.ts#L100)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`chunks` | [Consumable](globals.md#consumable) |
+
+**Returns:** *chunks is Consumable*
 
 ___
 
 ### `Const` jsonResponseTransformer
 
-▸ **jsonResponseTransformer**(`response`: Response‹›): *Promise‹any›*
+▸ **jsonResponseTransformer**(`response`: IncomingMessage‹›): *Promise‹object›*
 
-*Defined in [httpClient/jsonResponseTransformer.ts:3](https://github.com/hqoss/node-agent/blob/3b2a284/src/httpClient/jsonResponseTransformer.ts#L3)*
+Defined in lib/httpClient/jsonResponseTransformer.ts:7
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`response` | Response‹› |
+`response` | IncomingMessage‹› |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹object›*
+
+___
+
+### `Const` readableToBuffer
+
+▸ **readableToBuffer**(`response`: Readable): *Promise‹Buffer‹››*
+
+*Defined in [test/httpClient/httpClient.test.ts:178](https://github.com/hqoss/node-http-client/blob/d317187/test/httpClient/httpClient.test.ts#L178)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`response` | Readable |
+
+**Returns:** *Promise‹Buffer‹››*

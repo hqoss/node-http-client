@@ -1,14 +1,27 @@
 import { Agent, IncomingMessage, RequestOptions, request } from "http";
 import { Readable } from "stream";
 
-import { isConsumable } from "./guards";
-import { Method, HttpClientOpts, Consumable } from "./types";
+import {
+  Consumable,
+  HttpClientOpts,
+  Method,
+  ResponseTransformer,
+} from "./types";
 
-export default class HttpClient {
+export class HttpClient<T = IncomingMessage> {
   private readonly baseReqOpts: RequestOptions;
   readonly baseUrl: string;
+  // TODO missing implementation.
+  // willSendRequest?: RequestInterceptor
+  transformResponse: ResponseTransformer<T>;
 
   constructor({ baseUrl, baseReqOpts }: HttpClientOpts) {
+    const { protocol } = new URL(baseUrl);
+
+    if (protocol !== "http:") {
+      throw new Error("only http protocol is supported");
+    }
+
     const agent = new Agent({ keepAlive: true });
 
     this.baseReqOpts = {
@@ -17,29 +30,30 @@ export default class HttpClient {
     };
 
     this.baseUrl = baseUrl;
+    // @ts-ignore
+    this.transformResponse = (res) => res;
   }
 
-  get = (
-    pathOrUrl: string | URL,
-    reqOpts?: RequestOptions,
-  ): Promise<IncomingMessage> => {
+  get = (pathOrUrl: string | URL, reqOpts?: RequestOptions): Promise<T> => {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
 
-    return new Promise((resolve, reject) =>
+    const req: Promise<IncomingMessage> = new Promise((resolve, reject) =>
       request(url, opts).once("error", reject).once("response", resolve).end(),
     );
+
+    return req.then(this.transformResponse);
   };
 
-  post = (
+  post = async (
     pathOrUrl: string | URL,
     body: Consumable,
     reqOpts?: RequestOptions,
-  ): Promise<IncomingMessage> => {
+  ): Promise<T> => {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Post, reqOpts);
 
-    return this.write(url, body, opts);
+    return this.write(url, body, opts).then(this.transformResponse);
   };
 
   private write = (
@@ -82,3 +96,11 @@ export default class HttpClient {
     method,
   });
 }
+
+const isConsumable = (chunks: Consumable): chunks is Consumable => {
+  return (
+    Buffer.isBuffer(chunks) ||
+    chunks instanceof Readable ||
+    typeof chunks === "string"
+  );
+};

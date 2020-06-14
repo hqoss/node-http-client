@@ -65,6 +65,6 @@
     "extendedDiagnostics": true
   },
   "include": [
-    "./lib/**/*"
+    "./lib/**/*", "test/**/*"
   ]
 }

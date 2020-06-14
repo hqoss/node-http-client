@@ -1,4 +1,6 @@
 **
 !dist/**
 !src/**
+!LICENSE.md
 !README.md
+!SECURITY.md

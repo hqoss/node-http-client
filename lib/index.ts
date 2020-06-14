@@ -1,2 +1,1 @@
-export * from "./_httpClient";
-export * from "./_httpClient/types";
+export { HttpClient } from "./httpClient/httpClient";

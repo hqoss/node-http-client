@@ -1,5 +1,10 @@
 import type { Readable } from "stream";
-import { RequestOptions as HttpRequestOptions } from "http";
+import {
+  ClientRequest,
+  IncomingHttpHeaders,
+  IncomingMessage,
+  RequestOptions as HttpRequestOptions,
+} from "http";
 import { RequestOptions as HttpsRequestOptions } from "https";
 
 export type Consumable = Readable | Buffer | string;
@@ -18,4 +23,22 @@ export type HttpClientOpts = {
 export type HttpsClientOpts = {
   baseUrl: string;
   baseReqOpts?: HttpsRequestOptions;
+};
+
+// TODO missing implementation.
+export type RequestInterceptor = (
+  url: URL,
+  request: ClientRequest,
+) => void | Promise<void>;
+
+// TODO explore generic typing.
+export type ResponseTransformer<T> = (
+  response: IncomingMessage,
+) => T | Promise<T>;
+
+export type TransformedResponse<T> = {
+  headers: IncomingHttpHeaders;
+  statusCode?: number;
+  statusMessage?: string;
+  data: T;
 };
