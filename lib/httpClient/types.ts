@@ -10,5 +10,4 @@ export enum Method {
   // TODO add more...
 }
 
-// TODO missing implementation.
 export type RequestInterceptor = (url: URL, request: ClientRequest) => void;

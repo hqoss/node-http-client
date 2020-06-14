@@ -26,10 +26,14 @@ export const toBuffer = async (
   };
 };
 
-export const toJson = async <T = any>(
+export const toJSON = async <T = any>(
   response: IncomingMessage,
 ): Promise<TransformedResponse<T>> => {
   const { data, ...rest } = await toBuffer(response);
+
+  if (Buffer.byteLength(data) === 0) {
+    throw new TypeError("cannot convert empty buffer to JSON");
+  }
 
   return {
     ...rest,

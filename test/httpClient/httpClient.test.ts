@@ -115,7 +115,7 @@ tests.set("json transformer", async () => {
   const data = { foo: "bar" };
   const { headers, ...response } = await httpClient
     .post("/201", JSON.stringify(data))
-    .then((res) => transform.toJson<typeof data>(res));
+    .then((res) => transform.toJSON<typeof data>(res));
 
   assert.equal(headers["x-method-ack"], "post");
   assert.deepStrictEqual(response, {
