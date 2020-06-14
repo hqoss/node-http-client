@@ -1,2 +1,9 @@
+// Expose useful transformers...
+export { bufferResponseTransformer } from "./httpClient/bufferResponseTransformer";
+export { jsonResponseTransformer } from "./httpClient/jsonResponseTransformer";
+
+// Expose useful Header enum...
 export { Header } from "./httpClient/header";
+
+// Expose the client...
 export { HttpClient } from "./httpClient/httpClient";
