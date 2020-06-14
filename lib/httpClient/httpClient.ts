@@ -1,13 +1,12 @@
 import { Agent, IncomingMessage, RequestOptions, request } from "http";
 import { Readable } from "stream";
 
-import { Consumable, Method } from "./types";
+import { Consumable, Method, RequestInterceptor } from "./types";
 
 export class HttpClient {
   private readonly baseReqOpts: RequestOptions;
   readonly baseUrl: string;
-  // TODO missing implementation.
-  // willSendRequest?: RequestInterceptor
+  willSendRequest?: RequestInterceptor;
 
   constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
@@ -35,9 +34,17 @@ export class HttpClient {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
 
-    return new Promise((resolve, reject) =>
-      request(url, opts).once("error", reject).once("response", resolve).end(),
-    );
+    return new Promise((resolve, reject) => {
+      const req = request(url, opts)
+        .once("error", reject)
+        .once("response", resolve);
+
+      if (this.willSendRequest) {
+        this.willSendRequest(url, req);
+      }
+
+      return req.end();
+    });
   };
 
   post = async (
@@ -66,6 +73,10 @@ export class HttpClient {
       const req = request(url, opts)
         .once("error", reject)
         .once("response", resolve);
+
+      if (this.willSendRequest) {
+        this.willSendRequest(url, req);
+      }
 
       if (body instanceof Readable) {
         // Pipe ends the writable stream (req) implicitly.

@@ -11,7 +11,4 @@ export enum Method {
 }
 
 // TODO missing implementation.
-export type RequestInterceptor = (
-  url: URL,
-  request: ClientRequest,
-) => void | Promise<void>;
+export type RequestInterceptor = (url: URL, request: ClientRequest) => void;
