@@ -1,9 +1,10 @@
-import { Agent, IncomingMessage, RequestOptions, request } from "http";
+import { IncomingMessage } from "http";
+import { Agent, RequestOptions, request } from "https";
 import { Readable } from "stream";
 
-import { Consumable, Method, RequestInterceptor } from "./types";
+import { Consumable, Method, RequestInterceptor } from "../httpClient/types";
 
-export class HttpClient {
+export class HttpsClient {
   private readonly baseReqOpts: RequestOptions;
   readonly baseUrl: string;
   willSendRequest?: RequestInterceptor;
@@ -11,8 +12,8 @@ export class HttpClient {
   constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
 
-    if (protocol !== "http:") {
-      throw new Error(`only http protocol is supported, got ${protocol}`);
+    if (protocol !== "https:") {
+      throw new Error(`only https protocol is supported, got ${protocol}`);
     }
 
     const agent = new Agent({ keepAlive: true });
