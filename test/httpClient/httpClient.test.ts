@@ -4,25 +4,21 @@ import { createReadStream } from "fs";
 import { createServer } from "http";
 import { Readable } from "stream";
 
-import { HttpClient } from "../../lib/httpClient/httpClient";
-import { bufferResponseTransformer } from "../../lib/httpClient/bufferResponseTransformer";
-import { jsonResponseTransformer } from "../../lib/httpClient/jsonResponseTransformer";
-import { TransformedResponse } from "../../lib/httpClient/types";
+import { HttpClient, transform } from "../../lib";
 
 const runner = new EventEmitter();
 
 const port = 3000;
 
 const echoServer = createServer((req, res) => {
-  const [method, statusCode = "200"] = req.url
-    ? req.url.split("/").slice(1)
-    : ["get", "200"];
+  const method = req.method?.toLowerCase() || "unknown";
+  const statusCode = req.url?.toLowerCase().slice(1) || "unknown";
 
-  res.setHeader("x-method-ack", method.toLowerCase());
+  res.setHeader("x-method-ack", method);
   res.writeHead(parseInt(statusCode));
 
   if (method === "get") {
-    res.end("ok");
+    res.end("hello");
   } else {
     req.pipe(res);
   }
@@ -36,7 +32,7 @@ const httpClient = new HttpClient({ baseUrl: `http://localhost:${port}/` });
 const tests = new Map();
 
 tests.set("performs GET request gets back 200", async () => {
-  const res = await httpClient.get("/get/200");
+  const res = await httpClient.get("/200");
   const { headers, statusCode, statusMessage } = res;
   const resBuffer = await readableToBuffer(res);
 
@@ -44,11 +40,11 @@ tests.set("performs GET request gets back 200", async () => {
   assert.equal(statusCode, 200);
   assert.equal(statusMessage, "OK");
 
-  assert.deepStrictEqual(resBuffer, Buffer.from("ok"));
+  assert.deepStrictEqual(resBuffer, Buffer.from("hello"));
 });
 
 tests.set("performs GET request, gets back 204", async () => {
-  const res = await httpClient.get("/get/204");
+  const res = await httpClient.get("/204");
   const { headers, statusCode, statusMessage } = res;
   const resBuffer = await readableToBuffer(res);
 
@@ -61,7 +57,7 @@ tests.set("performs GET request, gets back 204", async () => {
 
 tests.set("performs POST request with a string", async () => {
   const data = "fooBar";
-  const res = await httpClient.post("/post/201", data);
+  const res = await httpClient.post("/201", data);
   const { headers, statusCode, statusMessage } = res;
   const resBuffer = await readableToBuffer(res);
 
@@ -74,7 +70,7 @@ tests.set("performs POST request with a string", async () => {
 
 tests.set("performs POST request with a Buffer", async () => {
   const data = Buffer.from("fooBar");
-  const res = await httpClient.post("/post/200", data);
+  const res = await httpClient.post("/200", data);
   const { headers, statusCode, statusMessage } = res;
   const resBuffer = await readableToBuffer(res);
 
@@ -87,7 +83,7 @@ tests.set("performs POST request with a Buffer", async () => {
 
 tests.set("performs POST request with a Stream", async () => {
   const data = createReadStream("LICENSE.md");
-  const res = await httpClient.post("/post/200", data);
+  const res = await httpClient.post("/200", data);
   const { headers, statusCode, statusMessage } = res;
   const resBuffer = await readableToBuffer(res);
 
@@ -103,9 +99,9 @@ tests.set("performs POST request with a Stream", async () => {
 
 tests.set("buffer transformer", async () => {
   const data = "Hello, World!";
-
-  const bufferHttpClient = new BufferHttpClient();
-  const { headers, ...response } = await bufferHttpClient.sendData(data);
+  const { headers, ...response } = await httpClient
+    .post("/201", data)
+    .then(transform.toBuffer);
 
   assert.equal(headers["x-method-ack"], "post");
   assert.deepStrictEqual(response, {
@@ -117,9 +113,9 @@ tests.set("buffer transformer", async () => {
 
 tests.set("json transformer", async () => {
   const data = { foo: "bar" };
-
-  const jsonHttpClient = new JsonHttpClient();
-  const { headers, ...response } = await jsonHttpClient.sendData(data);
+  const { headers, ...response } = await httpClient
+    .post("/201", JSON.stringify(data))
+    .then((res) => transform.toJson<typeof data>(res));
 
   assert.equal(headers["x-method-ack"], "post");
   assert.deepStrictEqual(response, {
@@ -152,28 +148,28 @@ runner.once("end", () => {
   process.exit(0);
 });
 
-class BufferHttpClient extends HttpClient<TransformedResponse<Buffer>> {
-  constructor() {
-    super({ baseUrl: `http://localhost:${port}/` });
-  }
+// class BufferHttpClient extends HttpClient<TransformedResponse<Buffer>> {
+//   constructor() {
+//     super({ baseUrl: `http://localhost:${port}/` });
+//   }
 
-  transformResponse = bufferResponseTransformer;
+//   transformResponse = bufferResponseTransformer;
 
-  sendData = (data: string) => this.post("/post/201", data);
-}
+//   sendData = (data: string) => this.post("/post/201", data);
+// }
 
-class JsonHttpClient extends HttpClient<TransformedResponse<object>> {
-  constructor() {
-    super({
-      baseUrl: `http://localhost:${port}/`,
-      baseReqOpts: { headers: { "content-type": "application/json" } },
-    });
-  }
+// class JsonHttpClient extends HttpClient<TransformedResponse<object>> {
+//   constructor() {
+//     super({
+//       baseUrl: `http://localhost:${port}/`,
+//       baseReqOpts: { headers: { "content-type": "application/json" } },
+//     });
+//   }
 
-  transformResponse = jsonResponseTransformer;
+//   transformResponse = jsonResponseTransformer;
 
-  sendData = (data: object) => this.post("/post/201", JSON.stringify(data));
-}
+//   sendData = (data: object) => this.post("/post/201", JSON.stringify(data));
+// }
 
 const readableToBuffer = async (response: Readable) => {
   const chunks = [];

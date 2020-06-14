@@ -1,19 +1,13 @@
 import { Agent, IncomingMessage, RequestOptions, request } from "http";
 import { Readable } from "stream";
 
-import {
-  Consumable,
-  HttpClientOpts,
-  Method,
-  ResponseTransformer,
-} from "./types";
+import { Consumable, HttpClientOpts, Method } from "./types";
 
-export class HttpClient<T = IncomingMessage> {
+export class HttpClient {
   private readonly baseReqOpts: RequestOptions;
   readonly baseUrl: string;
   // TODO missing implementation.
   // willSendRequest?: RequestInterceptor
-  transformResponse: ResponseTransformer<T>;
 
   constructor({ baseUrl, baseReqOpts }: HttpClientOpts) {
     const { protocol } = new URL(baseUrl);
@@ -34,26 +28,27 @@ export class HttpClient<T = IncomingMessage> {
     this.transformResponse = (res) => res;
   }
 
-  get = (pathOrUrl: string | URL, reqOpts?: RequestOptions): Promise<T> => {
+  get = (
+    pathOrUrl: string | URL,
+    reqOpts?: RequestOptions,
+  ): Promise<IncomingMessage> => {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
 
-    const req: Promise<IncomingMessage> = new Promise((resolve, reject) =>
+    return new Promise((resolve, reject) =>
       request(url, opts).once("error", reject).once("response", resolve).end(),
     );
-
-    return req.then(this.transformResponse);
   };
 
   post = async (
     pathOrUrl: string | URL,
     body: Consumable,
     reqOpts?: RequestOptions,
-  ): Promise<T> => {
+  ): Promise<IncomingMessage> => {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Post, reqOpts);
 
-    return this.write(url, body, opts).then(this.transformResponse);
+    return this.write(url, body, opts);
   };
 
   private write = (
