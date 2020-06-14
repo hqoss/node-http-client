@@ -1,13 +1,15 @@
 import { IncomingHttpHeaders } from "http";
 
-export const Authorization = "authorization";
-export const Accept = "accept";
-export const ContentLength = "content-length";
-export const ContentType = "content-type";
-export const CorrelationId = "x-correlation-id";
-export const RequestId = "x-request-id";
-export const IdToken = "x-id-token";
-export const UserAgent = "user-agent";
+export const key = {
+  Authorization: "authorization",
+  Accept: "accept",
+  ContentLength: "content-length",
+  ContentType: "content-type",
+  CorrelationId: "x-correlation-id",
+  RequestId: "x-request-id",
+  IdToken: "x-id-token",
+  UserAgent: "user-agent",
+};
 
 export const pickHeaders = (
   headers: IncomingHttpHeaders,

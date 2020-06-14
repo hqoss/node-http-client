@@ -1,12 +1,7 @@
-import { IncomingMessage, IncomingHttpHeaders } from "http";
+import { IncomingMessage } from "http";
 import { Readable } from "stream";
 
-export type TransformedResponse<T> = {
-  headers: IncomingHttpHeaders;
-  statusCode?: number;
-  statusMessage?: string;
-  data: T;
-};
+import { StatusClass, TransformedResponse } from "./types";
 
 export const toBuffer = async (
   response: IncomingMessage,
@@ -20,6 +15,7 @@ export const toBuffer = async (
 
   return {
     headers,
+    statusClass: getStatusClass(statusCode),
     statusCode,
     statusMessage,
     data,
@@ -47,4 +43,13 @@ const readableToBuffer = async (source: Readable) => {
     chunks.push(chunk);
   }
   return Buffer.concat(chunks);
+};
+
+const getStatusClass = (statusCode?: number): StatusClass => {
+  if (!statusCode) return StatusClass.Unknown;
+  if (statusCode >= 100 && statusCode < 200) return StatusClass.Informational;
+  if (statusCode >= 200 && statusCode < 300) return StatusClass.Successful;
+  if (statusCode >= 300 && statusCode < 400) return StatusClass.Redirection;
+  if (statusCode >= 400 && statusCode < 500) return StatusClass.BadRequest;
+  return StatusClass.ServerError;
 };

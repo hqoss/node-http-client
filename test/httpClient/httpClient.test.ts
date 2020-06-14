@@ -5,6 +5,7 @@ import { createServer } from "http";
 import { Readable } from "stream";
 
 import { HttpClient, transform } from "../../lib";
+import { StatusClass } from "../../lib/httpClient/types";
 
 const runner = new EventEmitter();
 
@@ -105,6 +106,7 @@ tests.set("buffer transformer", async () => {
 
   assert.equal(headers["x-method-ack"], "post");
   assert.deepStrictEqual(response, {
+    statusClass: StatusClass.Successful,
     statusCode: 201,
     statusMessage: "Created",
     data: Buffer.from(data),
@@ -119,6 +121,7 @@ tests.set("json transformer", async () => {
 
   assert.equal(headers["x-method-ack"], "post");
   assert.deepStrictEqual(response, {
+    statusClass: StatusClass.Successful,
     statusCode: 201,
     statusMessage: "Created",
     data,
