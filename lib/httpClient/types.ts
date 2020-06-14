@@ -1,24 +1,14 @@
 import type { Readable } from "stream";
-import { ClientRequest, RequestOptions as HttpRequestOptions } from "http";
-import { RequestOptions as HttpsRequestOptions } from "https";
+import type { ClientRequest } from "http";
 
 export type Consumable = Readable | Buffer | string;
 
 export enum Method {
   Get = "GET",
   Post = "POST",
+  Delete = "DELETE",
   // TODO add more...
 }
-
-export type HttpClientOpts = {
-  baseUrl: string;
-  baseReqOpts?: HttpRequestOptions;
-};
-
-export type HttpsClientOpts = {
-  baseUrl: string;
-  baseReqOpts?: HttpsRequestOptions;
-};
 
 // TODO missing implementation.
 export type RequestInterceptor = (

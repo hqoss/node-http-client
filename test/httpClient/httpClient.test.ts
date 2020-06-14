@@ -27,7 +27,7 @@ const echoServer = createServer((req, res) => {
   runner.emit("init");
 });
 
-const httpClient = new HttpClient({ baseUrl: `http://localhost:${port}/` });
+const httpClient = new HttpClient(`http://localhost:${port}/`);
 
 const tests = new Map();
 

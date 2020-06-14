@@ -26,7 +26,7 @@ export const toBuffer = async (
   };
 };
 
-export const toJson = async <T extends object = object>(
+export const toJson = async <T = any>(
   response: IncomingMessage,
 ): Promise<TransformedResponse<T>> => {
   const { data, ...rest } = await toBuffer(response);

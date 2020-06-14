@@ -1,7 +1,7 @@
 import { Agent, IncomingMessage, RequestOptions, request } from "http";
 import { Readable } from "stream";
 
-import { Consumable, HttpClientOpts, Method } from "./types";
+import { Consumable, Method } from "./types";
 
 export class HttpClient {
   private readonly baseReqOpts: RequestOptions;
@@ -9,7 +9,7 @@ export class HttpClient {
   // TODO missing implementation.
   // willSendRequest?: RequestInterceptor
 
-  constructor({ baseUrl, baseReqOpts }: HttpClientOpts) {
+  constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
 
     if (protocol !== "http:") {
