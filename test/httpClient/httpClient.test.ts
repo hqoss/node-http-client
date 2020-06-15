@@ -34,26 +34,24 @@ const tests = new Map();
 
 tests.set("performs GET request gets back 200", async () => {
   const res = await httpClient.get("/200");
-  const { headers, statusCode, statusMessage } = res;
-  const resBuffer = await readableToBuffer(res);
+  const { headers, statusCode, statusMessage, data } = res;
 
   assert.equal(headers["x-method-ack"], "get");
   assert.equal(statusCode, 200);
   assert.equal(statusMessage, "OK");
 
-  assert.deepStrictEqual(resBuffer, Buffer.from("hello"));
+  assert.deepStrictEqual(data, Buffer.from("hello"));
 });
 
 tests.set("performs GET request, gets back 204", async () => {
   const res = await httpClient.get("/204");
-  const { headers, statusCode, statusMessage } = res;
-  const resBuffer = await readableToBuffer(res);
+  const { headers, statusCode, statusMessage, data } = res;
 
   assert.equal(headers["x-method-ack"], "get");
   assert.equal(statusCode, 204);
   assert.equal(statusMessage, "No Content");
 
-  assert.deepStrictEqual(resBuffer, Buffer.alloc(0));
+  assert.deepStrictEqual(data, Buffer.alloc(0));
 });
 
 tests.set("performs DELETE request, gets back 202", async () => {

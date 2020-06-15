@@ -1,7 +1,14 @@
 import { Agent, IncomingMessage, RequestOptions, request } from "http";
+import { EventEmitter } from "events";
 import { Readable } from "stream";
 
-import { Consumable, Method, RequestInterceptor } from "./types";
+import {
+  Consumable,
+  Method,
+  RequestInterceptor,
+  TransformedResponse,
+} from "./types";
+import { toBuffer } from "./transform";
 
 export class HttpClient {
   private readonly baseReqOpts: RequestOptions;
@@ -31,30 +38,79 @@ export class HttpClient {
   get = (
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
-  ): Promise<IncomingMessage> => {
+  ): Promise<TransformedResponse<Buffer>> => {
+    const resolver = new EventEmitter();
+
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
 
     const req = request(url, opts);
 
+    // Successful request
+    req.once("response", (response) => {
+      // Error reading response
+      // response.once("error", error => {
+      //   resolver.emit("reject", error)
+
+      //   req.removeAllListeners()
+      //   response.removeAllListeners()
+      // })
+
+      // Premature connection close after response has been received
+      response.once("aborted", () => {
+        resolver.emit(
+          "reject",
+          new Error(
+            "premature connection close after the response has been received",
+          ),
+        );
+
+        req.removeAllListeners();
+        response.removeAllListeners();
+      });
+
+      // const chunks: Array<Buffer> = []
+
+      // response.once("data", chunk => {
+      //   chunks.push(chunk)
+      // })
+
+      // response.on("end", () => {
+      //   resolver.emit("resolve", Buffer.concat(chunks))
+
+      //   req.removeAllListeners()
+      //   response.removeAllListeners()
+      // })
+
+      toBuffer(response)
+        .then((tranformedResponse) => {
+          resolver.emit("resolve", tranformedResponse);
+
+          req.removeAllListeners();
+          response.removeAllListeners();
+        })
+        .catch((error) => {
+          resolver.emit("reject", error);
+
+          req.removeAllListeners();
+          response.removeAllListeners();
+        });
+    });
+
+    req.once("error", (error) => {
+      resolver.emit("reject", error);
+      req.removeAllListeners();
+    });
+
+    req.end();
+
     if (this.willSendRequest) {
       this.willSendRequest(url, req);
     }
 
-    return new Promise((resolve, reject) =>
-      req
-        .once("error", (error) => {
-          // @ts-ignore
-          if (error.code === "ECONNRESET") {
-            // Retry
-            return this.get(url, opts).then(resolve).catch(reject);
-          }
-
-          return reject(error);
-        })
-        .once("response", resolve)
-        .end(),
-    );
+    return new Promise((resolve, reject) => {
+      resolver.once("resolve", resolve).once("reject", reject);
+    });
   };
 
   delete = (
