@@ -35,17 +35,26 @@ export class HttpClient {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
 
-    return new Promise((resolve, reject) => {
-      const req = request(url, opts)
-        .once("error", reject)
-        .once("response", resolve);
+    const req = request(url, opts);
 
-      if (this.willSendRequest) {
-        this.willSendRequest(url, req);
-      }
+    if (this.willSendRequest) {
+      this.willSendRequest(url, req);
+    }
 
-      return req.end();
-    });
+    return new Promise((resolve, reject) =>
+      req
+        .once("error", (error) => {
+          // @ts-ignore
+          if (error.code === "ECONNRESET") {
+            // Retry
+            return this.get(url, opts).then(resolve).catch(reject);
+          }
+
+          return reject(error);
+        })
+        .once("response", resolve)
+        .end(),
+    );
   };
 
   delete = (
