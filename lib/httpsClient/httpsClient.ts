@@ -13,7 +13,10 @@ export class HttpsClient {
     const { protocol } = new URL(baseUrl);
 
     if (protocol !== "https:") {
-      throw new Error(`only https protocol is supported, got ${protocol}`);
+      throw new Error(`
+      only https protocol is supported, got ${protocol}
+      use HttpClient for http, or Http2Client for http2
+      `);
     }
 
     const agent = new Agent({ keepAlive: true });
@@ -24,8 +27,6 @@ export class HttpsClient {
     };
 
     this.baseUrl = baseUrl;
-    // @ts-ignore
-    this.transformResponse = (res) => res;
   }
 
   get = (
@@ -34,6 +35,26 @@ export class HttpsClient {
   ): Promise<IncomingMessage> => {
     const url = this.buildUrl(pathOrUrl);
     const opts = this.combineOpts(Method.Get, reqOpts);
+
+    return new Promise((resolve, reject) => {
+      const req = request(url, opts)
+        .once("error", reject)
+        .once("response", resolve);
+
+      if (this.willSendRequest) {
+        this.willSendRequest(url, req);
+      }
+
+      return req.end();
+    });
+  };
+
+  delete = (
+    pathOrUrl: string | URL,
+    reqOpts?: RequestOptions,
+  ): Promise<IncomingMessage> => {
+    const url = this.buildUrl(pathOrUrl);
+    const opts = this.combineOpts(Method.Delete, reqOpts);
 
     return new Promise((resolve, reject) => {
       const req = request(url, opts)
@@ -80,6 +101,10 @@ export class HttpsClient {
       }
 
       if (body instanceof Readable) {
+        // If there is an error reading data,
+        // destroy the request and pass the error.
+        body.once("error", req.destroy);
+
         // Pipe ends the writable stream (req) implicitly.
         // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
         body.pipe(req);

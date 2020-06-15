@@ -56,6 +56,18 @@ tests.set("performs GET request, gets back 204", async () => {
   assert.deepStrictEqual(resBuffer, Buffer.alloc(0));
 });
 
+tests.set("performs DELETE request, gets back 202", async () => {
+  const res = await httpClient.delete("/202");
+  const { headers, statusCode, statusMessage } = res;
+  const resBuffer = await readableToBuffer(res);
+
+  assert.equal(headers["x-method-ack"], "delete");
+  assert.equal(statusCode, 202);
+  assert.equal(statusMessage, "Accepted");
+
+  assert.deepStrictEqual(resBuffer, Buffer.alloc(0));
+});
+
 tests.set("performs POST request with a string", async () => {
   const data = "fooBar";
   const res = await httpClient.post("/201", data);
