@@ -45,7 +45,7 @@ const readableToBuffer = async (source: Readable) => {
   return Buffer.concat(chunks);
 };
 
-const getStatusClass = (statusCode?: number): StatusClass => {
+export const getStatusClass = (statusCode?: number): StatusClass => {
   if (!statusCode) return StatusClass.Unknown;
   if (statusCode >= 100 && statusCode < 200) return StatusClass.Informational;
   if (statusCode >= 200 && statusCode < 300) return StatusClass.Successful;

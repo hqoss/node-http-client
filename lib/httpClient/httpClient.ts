@@ -8,7 +8,8 @@ import {
   RequestInterceptor,
   TransformedResponse,
 } from "./types";
-import { toBuffer } from "./transform";
+
+import { getStatusClass } from "./transform";
 
 export class HttpClient {
   private readonly baseReqOpts: RequestOptions;
@@ -49,12 +50,12 @@ export class HttpClient {
     // Successful request
     req.once("response", (response) => {
       // Error reading response
-      // response.once("error", error => {
-      //   resolver.emit("reject", error)
+      response.once("error", (error) => {
+        resolver.emit("reject", error);
 
-      //   req.removeAllListeners()
-      //   response.removeAllListeners()
-      // })
+        req.removeAllListeners();
+        response.removeAllListeners();
+      });
 
       // Premature connection close after response has been received
       response.once("aborted", () => {
@@ -69,36 +70,36 @@ export class HttpClient {
         response.removeAllListeners();
       });
 
-      // const chunks: Array<Buffer> = []
+      const chunks: Array<Buffer> = [];
 
-      // response.once("data", chunk => {
-      //   chunks.push(chunk)
-      // })
+      response.on("data", (chunk) => {
+        chunks.push(chunk);
+      });
 
-      // response.on("end", () => {
-      //   resolver.emit("resolve", Buffer.concat(chunks))
+      response.once("end", () => {
+        const { headers, statusCode, statusMessage } = response;
 
-      //   req.removeAllListeners()
-      //   response.removeAllListeners()
-      // })
+        const transformedResponse = {
+          headers,
+          statusClass: getStatusClass(statusCode),
+          statusCode,
+          statusMessage,
+          data: Buffer.concat(chunks),
+        };
 
-      toBuffer(response)
-        .then((tranformedResponse) => {
-          resolver.emit("resolve", tranformedResponse);
+        resolver.emit("resolve", transformedResponse);
 
-          req.removeAllListeners();
-          response.removeAllListeners();
-        })
-        .catch((error) => {
-          resolver.emit("reject", error);
-
-          req.removeAllListeners();
-          response.removeAllListeners();
-        });
+        req.removeAllListeners();
+        response.removeAllListeners();
+      });
     });
 
     req.once("error", (error) => {
       resolver.emit("reject", error);
+      req.removeAllListeners();
+    });
+
+    req.once("end", () => {
       req.removeAllListeners();
     });
 
