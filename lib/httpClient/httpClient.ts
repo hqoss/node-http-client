@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { request, RequestOptions, IncomingMessage } from "http";
+import { request, RequestOptions } from "http";
 import { Readable } from "stream";
 
 import { EventType, TelemetryEvent } from "./telemetry";
@@ -29,13 +29,7 @@ class HttpClient {
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
-    return this.request(
-      pathOrUrl,
-      Method.Get,
-      reqOpts,
-      undefined,
-      telemetry,
-    ).then(toBufferResponse);
+    return this.request(pathOrUrl, Method.Get, reqOpts, undefined, telemetry);
   };
 
   post = (
@@ -44,9 +38,7 @@ class HttpClient {
     data?: Consumable,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
-    return this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry).then(
-      toBufferResponse,
-    );
+    return this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
   };
 
   delete = (
@@ -60,7 +52,7 @@ class HttpClient {
       reqOpts,
       undefined,
       telemetry,
-    ).then(toBufferResponse);
+    );
   };
 
   request = (
@@ -69,13 +61,14 @@ class HttpClient {
     reqOpts?: RequestOptions,
     data?: Consumable,
     telemetry?: EventEmitter,
-  ): Promise<IncomingMessage> => {
+  ): Promise<ConsumedResponse<Buffer>> => {
     if (data && !isConsumable(data)) {
       return Promise.reject(
         new TypeError("body must be one of: Readable, Buffer, string"),
       );
     }
 
+    const resolver = new EventEmitter();
     const url = this.buildUrl(pathOrUrl);
     const contentLength = getContentLength(data);
 
@@ -97,68 +90,77 @@ class HttpClient {
       new TelemetryEvent(EventType.RequestStreamInitialised, { url, opts }),
     );
 
-    return new Promise((resolve, reject) => {
-      req.once("socket", (socket) => {
-        telemetry?.emit(
-          EventType.SocketObtained,
-          new TelemetryEvent(EventType.SocketObtained),
-        );
+    req.once("socket", (socket) => {
+      telemetry?.emit(
+        EventType.SocketObtained,
+        new TelemetryEvent(EventType.SocketObtained),
+      );
 
-        socket.once("connect", () => {
-          telemetry?.emit(
-            EventType.ConnectionEstablished,
-            new TelemetryEvent(EventType.ConnectionEstablished),
-          );
+      socket.once("connect", () => {
+        telemetry?.emit(
+          EventType.ConnectionEstablished,
+          new TelemetryEvent(EventType.ConnectionEstablished),
+        );
+      });
+    });
+
+    req.once("response", (res) => {
+      telemetry?.emit(
+        EventType.ResponseStreamReceived,
+        new TelemetryEvent(EventType.ResponseStreamReceived),
+      );
+
+      toBufferResponse(res)
+        .then((bufferResponse) => {
+          resolver.emit("resolve", bufferResponse);
+        })
+        .catch((error) => {
+          resolver.emit("reject", error);
         });
-      });
+    });
 
-      req.once("response", (res) => {
-        telemetry?.emit(
-          EventType.ResponseStreamReceived,
-          new TelemetryEvent(EventType.ResponseStreamReceived),
-        );
+    req.once("error", (error) => {
+      // See https://nodejs.org/api/http.html#http_request_destroy_error
+      //
+      // No further events will be emitted.
+      // All listeners will be removed once the request is garbage collected.
+      // Remaining data in the response will be dropped and the socket will be destroyed.
+      req.destroy();
 
-        resolve(res);
-      });
+      telemetry?.emit(
+        EventType.RequestError,
+        new TelemetryEvent(EventType.RequestError, undefined, error),
+      );
 
-      req.once("error", (error) => {
+      resolver.emit("reject", error);
+    });
+
+    if (data instanceof Readable) {
+      // If there is an error reading data, destroy the request and pass the error.
+      data.once("error", (error) => {
         // See https://nodejs.org/api/http.html#http_request_destroy_error
         //
         // No further events will be emitted.
         // All listeners will be removed once the request is garbage collected.
         // Remaining data in the response will be dropped and the socket will be destroyed.
-        req.destroy();
-
-        telemetry?.emit(
-          EventType.RequestError,
-          new TelemetryEvent(EventType.RequestError, undefined, error),
-        );
-
-        reject(error);
+        req.destroy(error);
       });
 
-      if (data instanceof Readable) {
-        // If there is an error reading data, destroy the request and pass the error.
-        data.once("error", (error) => {
-          // See https://nodejs.org/api/http.html#http_request_destroy_error
-          //
-          // No further events will be emitted.
-          // All listeners will be removed once the request is garbage collected.
-          // Remaining data in the response will be dropped and the socket will be destroyed.
-          req.destroy(error);
-        });
+      // Pipe ends the writable stream (req) implicitly.
+      // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
+      data.pipe(req);
+    } else {
+      req.end(data);
+    }
 
-        // Pipe ends the writable stream (req) implicitly.
-        // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
-        data.pipe(req);
-      } else {
-        req.end(data);
-      }
+    telemetry?.emit(
+      EventType.RequestStreamEnded,
+      new TelemetryEvent(EventType.RequestStreamEnded),
+    );
 
-      telemetry?.emit(
-        EventType.RequestStreamEnded,
-        new TelemetryEvent(EventType.RequestStreamEnded),
-      );
+    return new Promise((resolve, reject) => {
+      resolver.once("resolve", (response) => resolve(response));
+      resolver.once("reject", (error) => reject(error));
     });
   };
 

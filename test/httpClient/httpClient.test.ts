@@ -5,11 +5,7 @@ import { Agent, createServer } from "http";
 
 import HttpClient from "../../lib/httpClient/httpClient";
 import { EventType } from "../../lib/httpClient/telemetry";
-import {
-  readableToBuffer,
-  toBufferResponse,
-} from "../../lib/httpClient/transform";
-import { Method } from "../../lib/httpClient/types";
+import { Method, StatusClass } from "../../lib/httpClient/types";
 
 const noop = () => {};
 
@@ -97,8 +93,12 @@ tests.set("perform GET request, get back response", () => {
   const runner = new EventEmitter();
   const port = 3000;
   const data = Buffer.from("Hello, world!");
+  const date = new Date().toISOString();
 
-  const server = createServer((_req, res) => res.end(data)).listen(port, () => {
+  const server = createServer((_req, res) => {
+    res.setHeader("date", date);
+    res.end(data);
+  }).listen(port, () => {
     runner.emit("init");
   });
 
@@ -119,11 +119,25 @@ tests.set("perform GET request, get back response", () => {
 
   runner.once("init", async () => {
     try {
-      const response = await client
-        .request("/", Method.Get, undefined, undefined, telemetry)
-        .then(readableToBuffer);
+      const response = await client.request(
+        "/",
+        Method.Get,
+        undefined,
+        undefined,
+        telemetry,
+      );
 
-      assert.deepStrictEqual(response, data);
+      assert.deepStrictEqual(response, {
+        data,
+        headers: {
+          "content-length": `${Buffer.byteLength(data)}`,
+          connection: "close",
+          date,
+        },
+        statusClass: StatusClass.Successful,
+        statusCode: 200,
+        statusMessage: "OK",
+      });
       assert.deepStrictEqual(telemetry.eventNames(), [EventType.RequestError]);
       runner.emit("end");
     } catch (error) {
@@ -226,11 +240,21 @@ tests.set("perform POST request, get back response", () => {
 
   runner.once("init", async () => {
     try {
-      const response = await client
-        .request("/", Method.Post, undefined, data, telemetry)
-        .then(readableToBuffer);
+      const {
+        headers: { date: _date, ...headers },
+        ...response
+      } = await client.request("/", Method.Post, undefined, data, telemetry);
 
-      assert.deepStrictEqual(response, data);
+      assert.deepStrictEqual(headers, {
+        connection: "close",
+        "transfer-encoding": "chunked",
+      });
+      assert.deepStrictEqual(response, {
+        data,
+        statusClass: StatusClass.Successful,
+        statusCode: 200,
+        statusMessage: "OK",
+      });
       assert.deepStrictEqual(telemetry.eventNames(), [EventType.RequestError]);
       runner.emit("end");
     } catch (error) {
@@ -270,9 +294,7 @@ tests.set("handle keep-alive", () => {
   runner.once("init", async () => {
     try {
       const tasks = [...Array(numberOfRequests).keys()].map(() => {
-        return client
-          .request("/", Method.Get, undefined, undefined, telemetry)
-          .then(toBufferResponse);
+        return client.request("/", Method.Get, undefined, undefined, telemetry);
       });
 
       const res = await Promise.all(tasks);
