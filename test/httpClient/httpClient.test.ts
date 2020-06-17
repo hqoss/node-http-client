@@ -16,6 +16,7 @@ const noop = () => {};
 const tests = new Map();
 
 tests.set("handle connection error", async () => {
+  const possibleErrorCodes = ["EAI_AGAIN", "ENOTFOUND"];
   const client = new HttpClient("http://non-existent-host/");
 
   const telemetry = new EventEmitter();
@@ -24,7 +25,7 @@ tests.set("handle connection error", async () => {
   telemetry.once(EventType.RequestStreamEnded, noop);
   telemetry.once(EventType.SocketObtained, noop);
   telemetry.once(EventType.RequestError, ({ error }) => {
-    assert.equal(error.code, "ENOTFOUND");
+    assert.ok(possibleErrorCodes.includes(error.code));
   });
 
   // These will be left dangling. See related assert below.
@@ -38,7 +39,7 @@ tests.set("handle connection error", async () => {
         throw new Error("expected request error");
       });
   } catch (error) {
-    assert.equal(error.code, "ENOTFOUND");
+    assert.ok(possibleErrorCodes.includes(error.code));
     assert.deepStrictEqual(telemetry.eventNames(), [
       EventType.ConnectionEstablished,
       EventType.ResponseStreamReceived,
