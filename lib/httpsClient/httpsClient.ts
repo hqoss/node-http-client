@@ -3,12 +3,18 @@ import { Agent, request, RequestOptions } from "https";
 import { Readable } from "stream";
 
 import { EventType, TelemetryEvent } from "../httpClient/telemetry";
-import { Method, ConsumedResponse, Consumable } from "../httpClient/types";
+import {
+  ConsumedResponse,
+  Consumable,
+  Method,
+  RequestInterceptor,
+} from "../httpClient/types";
 import { toBufferResponse } from "../httpClient/transform";
 
 class HttpsClient {
   private baseUrl: string;
   private baseReqOpts?: RequestOptions;
+  willSendRequest?: RequestInterceptor<RequestOptions>;
 
   constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
@@ -87,6 +93,10 @@ class HttpsClient {
     }
 
     const req = request(url, opts);
+
+    if (this.willSendRequest) {
+      this.willSendRequest(url, opts);
+    }
 
     telemetry?.emit(
       EventType.RequestStreamInitialised,

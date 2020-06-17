@@ -1,4 +1,4 @@
-import type { ClientRequest, IncomingHttpHeaders } from "http";
+import type { IncomingHttpHeaders } from "http";
 import type { Readable } from "stream";
 
 export type Consumable = Readable | Buffer | string;
@@ -27,4 +27,4 @@ export type ConsumedResponse<T> = {
   data: T;
 };
 
-export type RequestInterceptor = (url: URL, request: ClientRequest) => void;
+export type RequestInterceptor<T> = (url: URL, opts: T) => void;
