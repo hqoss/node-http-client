@@ -43,8 +43,8 @@ class HttpsClient {
 
   post = (
     pathOrUrl: string | URL,
+    data: Consumable,
     reqOpts?: RequestOptions,
-    data?: Consumable,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
     return this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);

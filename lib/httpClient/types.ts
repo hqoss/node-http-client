@@ -28,6 +28,6 @@ export type ConsumedResponse<T> = {
   data: T;
 };
 
-export type RequestInterceptor<T> = (url: URL, opts: T) => void;
+type RequestInterceptor<T> = (url: URL, opts: T) => void;
 export type HttpRequestInterceptor = RequestInterceptor<RequestOptions>;
 export type HttpsRequestInterceptor = RequestInterceptor<SecureRequestOptions>;
