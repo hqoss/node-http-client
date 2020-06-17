@@ -76,7 +76,6 @@ class HttpClient {
       );
     }
 
-    const resolver = new EventEmitter();
     const url = this.buildUrl(pathOrUrl);
     const contentLength = getContentLength(data);
 
@@ -98,71 +97,68 @@ class HttpClient {
       new TelemetryEvent(EventType.RequestStreamInitialised, { url, opts }),
     );
 
-    req.once("socket", (socket) => {
-      telemetry?.emit(
-        EventType.SocketObtained,
-        new TelemetryEvent(EventType.SocketObtained),
-      );
-
-      socket.once("connect", () => {
+    return new Promise((resolve, reject) => {
+      req.once("socket", (socket) => {
         telemetry?.emit(
-          EventType.ConnectionEstablished,
-          new TelemetryEvent(EventType.ConnectionEstablished),
+          EventType.SocketObtained,
+          new TelemetryEvent(EventType.SocketObtained),
         );
+
+        socket.once("connect", () => {
+          telemetry?.emit(
+            EventType.ConnectionEstablished,
+            new TelemetryEvent(EventType.ConnectionEstablished),
+          );
+        });
       });
-    });
 
-    req.once("response", (res) => {
-      telemetry?.emit(
-        EventType.ResponseStreamReceived,
-        new TelemetryEvent(EventType.ResponseStreamReceived),
-      );
+      req.once("response", (res) => {
+        telemetry?.emit(
+          EventType.ResponseStreamReceived,
+          new TelemetryEvent(EventType.ResponseStreamReceived),
+        );
 
-      resolver.emit("resolve", res);
-    });
+        resolve(res);
+      });
 
-    req.once("error", (error) => {
-      // See https://nodejs.org/api/http.html#http_request_destroy_error
-      //
-      // No further events will be emitted.
-      // All listeners will be removed once the request is garbage collected.
-      // Remaining data in the response will be dropped and the socket will be destroyed.
-      req.destroy();
-
-      telemetry?.emit(
-        EventType.RequestError,
-        new TelemetryEvent(EventType.RequestError, undefined, error),
-      );
-
-      resolver.emit("reject", error);
-    });
-
-    if (data instanceof Readable) {
-      // If there is an error reading data, destroy the request and pass the error.
-      data.once("error", (error) => {
+      req.once("error", (error) => {
         // See https://nodejs.org/api/http.html#http_request_destroy_error
         //
         // No further events will be emitted.
         // All listeners will be removed once the request is garbage collected.
         // Remaining data in the response will be dropped and the socket will be destroyed.
-        req.destroy(error);
+        req.destroy();
+
+        telemetry?.emit(
+          EventType.RequestError,
+          new TelemetryEvent(EventType.RequestError, undefined, error),
+        );
+
+        reject(error);
       });
 
-      // Pipe ends the writable stream (req) implicitly.
-      // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
-      data.pipe(req);
-    } else {
-      req.end(data);
-    }
+      if (data instanceof Readable) {
+        // If there is an error reading data, destroy the request and pass the error.
+        data.once("error", (error) => {
+          // See https://nodejs.org/api/http.html#http_request_destroy_error
+          //
+          // No further events will be emitted.
+          // All listeners will be removed once the request is garbage collected.
+          // Remaining data in the response will be dropped and the socket will be destroyed.
+          req.destroy(error);
+        });
 
-    telemetry?.emit(
-      EventType.RequestStreamEnded,
-      new TelemetryEvent(EventType.RequestStreamEnded),
-    );
+        // Pipe ends the writable stream (req) implicitly.
+        // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
+        data.pipe(req);
+      } else {
+        req.end(data);
+      }
 
-    return new Promise((resolve, reject) => {
-      resolver.once("resolve", resolve);
-      resolver.once("reject", reject);
+      telemetry?.emit(
+        EventType.RequestStreamEnded,
+        new TelemetryEvent(EventType.RequestStreamEnded),
+      );
     });
   };
 
