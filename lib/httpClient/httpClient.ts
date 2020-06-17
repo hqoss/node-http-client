@@ -96,12 +96,14 @@ class HttpClient {
         new TelemetryEvent(EventType.SocketObtained),
       );
 
-      socket.once("connect", () => {
-        telemetry?.emit(
-          EventType.ConnectionEstablished,
-          new TelemetryEvent(EventType.ConnectionEstablished),
-        );
-      });
+      if (socket.connecting) {
+        socket.once("connect", () => {
+          telemetry?.emit(
+            EventType.ConnectionEstablished,
+            new TelemetryEvent(EventType.ConnectionEstablished),
+          );
+        });
+      }
     });
 
     req.once("response", (res) => {
