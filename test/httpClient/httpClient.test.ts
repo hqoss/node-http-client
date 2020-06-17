@@ -1,11 +1,14 @@
 import assert from "assert";
 import { EventEmitter } from "events";
 import { createReadStream } from "fs";
-import { createServer } from "http";
+import { Agent, createServer } from "http";
 
 import HttpClient from "../../lib/httpClient/httpClient";
 import { EventType } from "../../lib/httpClient/telemetry";
-import { readableToBuffer } from "../../lib/httpClient/transform";
+import {
+  readableToBuffer,
+  toBufferResponse,
+} from "../../lib/httpClient/transform";
 import { Method } from "../../lib/httpClient/types";
 
 const noop = () => {};
@@ -30,7 +33,7 @@ tests.set("handle connection error", async () => {
 
   try {
     await client
-      .request("/", { method: Method.Get }, undefined, telemetry)
+      .request("/", Method.Get, undefined, undefined, telemetry)
       .then(() => {
         throw new Error("expected request error");
       });
@@ -68,7 +71,7 @@ tests.set("handle destroyed request after connect", async () => {
 
   runner.once("init", async () => {
     try {
-      await client.request("/", { method: Method.Get }, undefined, telemetry);
+      await client.request("/", Method.Get, undefined, undefined, telemetry);
       runner.emit("end", new Error("expected request error"));
     } catch (error) {
       assert.equal(error.code, "ECONNRESET");
@@ -102,12 +105,9 @@ tests.set("perform GET request, get back response", () => {
 
   const telemetry = new EventEmitter();
 
-  telemetry.once(
-    EventType.RequestStreamInitialised,
-    ({ data: { reqOpts } }) => {
-      assert.deepStrictEqual(reqOpts, { method: Method.Get });
-    },
-  );
+  telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
+    assert.deepStrictEqual(opts, { method: Method.Get });
+  });
   telemetry.once(EventType.RequestStreamEnded, noop);
   telemetry.once(EventType.SocketObtained, noop);
   telemetry.once(EventType.ConnectionEstablished, noop);
@@ -119,7 +119,7 @@ tests.set("perform GET request, get back response", () => {
   runner.once("init", async () => {
     try {
       const response = await client
-        .request("/", { method: Method.Get }, undefined, telemetry)
+        .request("/", Method.Get, undefined, undefined, telemetry)
         .then(readableToBuffer);
 
       assert.deepStrictEqual(response, data);
@@ -171,7 +171,7 @@ tests.set(
 
     runner.once("init", async () => {
       try {
-        await client.request("/", { method: Method.Post }, data, telemetry);
+        await client.request("/", Method.Post, undefined, data, telemetry);
         runner.emit("end", new Error("expected request error"));
       } catch (error) {
         assert.equal(error.code, "ENOENT");
@@ -207,17 +207,14 @@ tests.set("perform POST request, get back response", () => {
 
   const telemetry = new EventEmitter();
 
-  telemetry.once(
-    EventType.RequestStreamInitialised,
-    ({ data: { reqOpts } }) => {
-      assert.deepStrictEqual(reqOpts, {
-        method: Method.Post,
-        headers: {
-          "content-length": Buffer.byteLength(data),
-        },
-      });
-    },
-  );
+  telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
+    assert.deepStrictEqual(opts, {
+      method: Method.Post,
+      headers: {
+        "content-length": Buffer.byteLength(data),
+      },
+    });
+  });
   telemetry.once(EventType.RequestStreamEnded, noop);
   telemetry.once(EventType.SocketObtained, noop);
   telemetry.once(EventType.ConnectionEstablished, noop);
@@ -229,11 +226,58 @@ tests.set("perform POST request, get back response", () => {
   runner.once("init", async () => {
     try {
       const response = await client
-        .request("/", { method: Method.Post }, data, telemetry)
+        .request("/", Method.Post, undefined, data, telemetry)
         .then(readableToBuffer);
 
       assert.deepStrictEqual(response, data);
       assert.deepStrictEqual(telemetry.eventNames(), [EventType.RequestError]);
+      runner.emit("end");
+    } catch (error) {
+      runner.emit("end", error);
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    runner.once("end", (error) => {
+      server.close();
+
+      if (error) return reject(error);
+      return resolve();
+    });
+  });
+});
+
+tests.set("handle keep-alive", () => {
+  const runner = new EventEmitter();
+  const port = 3000;
+  const data = Buffer.from("Hello, world!");
+  const agent = new Agent({ keepAlive: true });
+  const numberOfRequests = 100;
+
+  const server = createServer((_req, res) => res.end(data)).listen(port, () => {
+    runner.emit("init");
+  });
+
+  const client = new HttpClient(`http://localhost:${port}/`, { agent });
+
+  const telemetry = new EventEmitter();
+
+  telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
+    assert.deepStrictEqual(opts, { method: Method.Get, agent });
+  });
+
+  runner.once("init", async () => {
+    try {
+      const tasks = [...Array(numberOfRequests).keys()].map(() => {
+        return client
+          .request("/", Method.Get, undefined, undefined, telemetry)
+          .then(toBufferResponse);
+      });
+
+      const res = await Promise.all(tasks);
+
+      assert.equal(res.length, numberOfRequests);
+      assert.deepStrictEqual(telemetry.eventNames(), []);
       runner.emit("end");
     } catch (error) {
       runner.emit("end", error);

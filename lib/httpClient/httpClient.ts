@@ -29,10 +29,13 @@ class HttpClient {
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
-    const opts = this.combineOpts(Method.Get, reqOpts);
-    return this.request(pathOrUrl, opts, undefined, telemetry).then(
-      toBufferResponse,
-    );
+    return this.request(
+      pathOrUrl,
+      Method.Get,
+      reqOpts,
+      undefined,
+      telemetry,
+    ).then(toBufferResponse);
   };
 
   post = (
@@ -41,8 +44,7 @@ class HttpClient {
     data?: Consumable,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
-    const opts = this.combineOpts(Method.Post, reqOpts);
-    return this.request(pathOrUrl, opts, data, telemetry).then(
+    return this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry).then(
       toBufferResponse,
     );
   };
@@ -52,15 +54,19 @@ class HttpClient {
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
   ): Promise<ConsumedResponse<Buffer>> => {
-    const opts = this.combineOpts(Method.Delete, reqOpts);
-    return this.request(pathOrUrl, opts, undefined, telemetry).then(
-      toBufferResponse,
-    );
+    return this.request(
+      pathOrUrl,
+      Method.Delete,
+      reqOpts,
+      undefined,
+      telemetry,
+    ).then(toBufferResponse);
   };
 
   request = (
     pathOrUrl: string | URL,
-    reqOpts: RequestOptions,
+    method: Method,
+    reqOpts?: RequestOptions,
     data?: Consumable,
     telemetry?: EventEmitter,
   ): Promise<IncomingMessage> => {
@@ -70,28 +76,26 @@ class HttpClient {
       );
     }
 
+    const resolver = new EventEmitter();
+    const url = this.buildUrl(pathOrUrl);
     const contentLength = getContentLength(data);
 
+    const opts = this.combineOpts(method, reqOpts);
+
     if (typeof contentLength === "number" && contentLength !== NaN) {
-      Object.assign(reqOpts, {
+      Object.assign(opts, {
         headers: {
-          ...reqOpts.headers,
+          ...opts.headers,
           "content-length": contentLength,
         },
       });
     }
 
-    const resolver = new EventEmitter();
-
-    const url = this.buildUrl(pathOrUrl);
-
-    const req = request(url, reqOpts);
-
-    req.setMaxListeners(5);
+    const req = request(url, opts);
 
     telemetry?.emit(
       EventType.RequestStreamInitialised,
-      new TelemetryEvent(EventType.RequestStreamInitialised, { url, reqOpts }),
+      new TelemetryEvent(EventType.RequestStreamInitialised, { url, opts }),
     );
 
     req.once("socket", (socket) => {
