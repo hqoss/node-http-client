@@ -1,5 +1,6 @@
-import type { IncomingHttpHeaders } from "http";
+import type { IncomingHttpHeaders, RequestOptions } from "http";
 import type { Readable } from "stream";
+import type { RequestOptions as SecureRequestOptions } from "https";
 
 export type Consumable = Readable | Buffer | string;
 
@@ -28,3 +29,5 @@ export type ConsumedResponse<T> = {
 };
 
 export type RequestInterceptor<T> = (url: URL, opts: T) => void;
+export type HttpRequestInterceptor = RequestInterceptor<RequestOptions>;
+export type HttpsRequestInterceptor = RequestInterceptor<SecureRequestOptions>;

@@ -6,15 +6,15 @@ import { EventType, TelemetryEvent } from "../httpClient/telemetry";
 import {
   ConsumedResponse,
   Consumable,
+  HttpsRequestInterceptor,
   Method,
-  RequestInterceptor,
 } from "../httpClient/types";
 import { toBufferResponse } from "../httpClient/transform";
 
 class HttpsClient {
   private baseUrl: string;
   private baseReqOpts?: RequestOptions;
-  willSendRequest?: RequestInterceptor<RequestOptions>;
+  willSendRequest?: HttpsRequestInterceptor;
 
   constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
