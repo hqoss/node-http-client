@@ -102,12 +102,12 @@ tests.set("perform GET request, get back response", () => {
     runner.emit("init");
   });
 
-  const client = new HttpClient(`http://localhost:${port}/`);
+  const client = new HttpClient(`http://localhost:${port}/`, { agent: false });
 
   const telemetry = new EventEmitter();
 
   telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
-    assert.deepStrictEqual(opts, { method: Method.Get });
+    assert.deepStrictEqual(opts, { agent: false, method: Method.Get });
   });
   telemetry.once(EventType.RequestStreamEnded, noop);
   telemetry.once(EventType.SocketObtained, noop);
@@ -218,16 +218,17 @@ tests.set("perform POST request, get back response", () => {
     runner.emit("init");
   });
 
-  const client = new HttpClient(`http://localhost:${port}/`);
+  const client = new HttpClient(`http://localhost:${port}/`, { agent: false });
 
   const telemetry = new EventEmitter();
 
   telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
     assert.deepStrictEqual(opts, {
-      method: Method.Post,
+      agent: false,
       headers: {
         "content-length": Buffer.byteLength(data),
       },
+      method: Method.Post,
     });
   });
   telemetry.once(EventType.RequestStreamEnded, noop);
@@ -276,19 +277,24 @@ tests.set("handle keep-alive", () => {
   const runner = new EventEmitter();
   const port = 3000;
   const data = Buffer.from("Hello, world!");
-  const agent = new Agent({ keepAlive: true });
+  const date = new Date().toISOString();
   const numberOfRequests = 100;
 
-  const server = createServer((_req, res) => res.end(data)).listen(port, () => {
+  const server = createServer((_req, res) => {
+    res.setHeader("date", date);
+    res.end(data);
+  }).listen(port, () => {
     runner.emit("init");
   });
 
-  const client = new HttpClient(`http://localhost:${port}/`, { agent });
+  const client = new HttpClient(`http://localhost:${port}/`);
 
   const telemetry = new EventEmitter();
 
   telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
-    assert.deepStrictEqual(opts, { method: Method.Get, agent });
+    assert.ok(opts.agent instanceof Agent);
+    assert.equal(opts.agent.keepAlive, true);
+    assert.equal(opts.method, Method.Get);
   });
 
   runner.once("init", async () => {
@@ -301,6 +307,21 @@ tests.set("handle keep-alive", () => {
 
       assert.equal(res.length, numberOfRequests);
       assert.deepStrictEqual(telemetry.eventNames(), []);
+
+      res.forEach((response) => {
+        assert.deepStrictEqual(response, {
+          data,
+          headers: {
+            "content-length": `${Buffer.byteLength(data)}`,
+            connection: "keep-alive",
+            date,
+          },
+          statusClass: StatusClass.Successful,
+          statusCode: 200,
+          statusMessage: "OK",
+        });
+      });
+
       runner.emit("end");
     } catch (error) {
       runner.emit("end", error);

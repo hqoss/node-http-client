@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { request, RequestOptions } from "http";
+import { Agent, request, RequestOptions } from "http";
 import { Readable } from "stream";
 
 import { EventType, TelemetryEvent } from "./telemetry";
@@ -21,7 +21,10 @@ class HttpClient {
     }
 
     this.baseUrl = baseUrl;
-    this.baseReqOpts = baseReqOpts;
+    this.baseReqOpts = {
+      agent: new Agent({ keepAlive: true }),
+      ...baseReqOpts,
+    };
   }
 
   get = (

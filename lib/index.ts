@@ -8,4 +8,4 @@ export * as types from "./httpClient/types";
 export { default as HttpClient } from "./httpClient/httpClient";
 
 // Expose Https client...
-export { HttpsClient } from "./httpsClient/httpsClient";
+export { default as HttpsClient } from "./httpsClient/httpsClient";
