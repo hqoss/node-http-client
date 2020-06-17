@@ -1,6 +1,6 @@
 import { IncomingHttpHeaders } from "http";
 
-export const key = {
+export const Header = {
   Authorization: "authorization",
   Accept: "accept",
   ContentLength: "content-length",

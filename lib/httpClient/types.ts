@@ -19,7 +19,7 @@ export enum StatusClass {
   ServerError = 5,
 }
 
-export type TransformedResponse<T> = {
+export type ConsumedResponse<T> = {
   headers: IncomingHttpHeaders;
   statusClass: StatusClass;
   statusCode?: number;

@@ -1,20 +1,14 @@
-import { Agent, IncomingMessage, RequestOptions, request } from "http";
 import { EventEmitter } from "events";
+import { request, RequestOptions, IncomingMessage } from "http";
 import { Readable } from "stream";
 
-import {
-  Consumable,
-  Method,
-  RequestInterceptor,
-  TransformedResponse,
-} from "./types";
+import { EventType, TelemetryEvent } from "./telemetry";
+import { Method, ConsumedResponse, Consumable } from "./types";
+import { toBufferResponse } from "./transform";
 
-import { getStatusClass } from "./transform";
-
-export class HttpClient {
-  private readonly baseReqOpts: RequestOptions;
-  readonly baseUrl: string;
-  willSendRequest?: RequestInterceptor;
+class HttpClient {
+  private baseUrl: string;
+  private baseReqOpts?: RequestOptions;
 
   constructor(baseUrl: string, baseReqOpts?: RequestOptions) {
     const { protocol } = new URL(baseUrl);
@@ -26,158 +20,145 @@ export class HttpClient {
       `);
     }
 
-    const agent = new Agent({ keepAlive: true });
-
-    this.baseReqOpts = {
-      agent,
-      ...baseReqOpts,
-    };
-
     this.baseUrl = baseUrl;
+    this.baseReqOpts = baseReqOpts;
   }
 
   get = (
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
-  ): Promise<TransformedResponse<Buffer>> => {
-    const resolver = new EventEmitter();
-
-    const url = this.buildUrl(pathOrUrl);
+    telemetry?: EventEmitter,
+  ): Promise<ConsumedResponse<Buffer>> => {
     const opts = this.combineOpts(Method.Get, reqOpts);
+    return this.request(pathOrUrl, opts, undefined, telemetry).then(
+      toBufferResponse,
+    );
+  };
 
-    const req = request(url, opts);
-
-    // Successful request
-    req.once("response", (response) => {
-      // Error reading response
-      response.once("error", (error) => {
-        resolver.emit("reject", error);
-
-        req.removeAllListeners();
-        response.removeAllListeners();
-      });
-
-      // Premature connection close after response has been received
-      response.once("aborted", () => {
-        resolver.emit(
-          "reject",
-          new Error(
-            "premature connection close after the response has been received",
-          ),
-        );
-
-        req.removeAllListeners();
-        response.removeAllListeners();
-      });
-
-      const chunks: Array<Buffer> = [];
-
-      response.on("data", (chunk) => {
-        chunks.push(chunk);
-      });
-
-      response.once("end", () => {
-        const { headers, statusCode, statusMessage } = response;
-
-        const transformedResponse = {
-          headers,
-          statusClass: getStatusClass(statusCode),
-          statusCode,
-          statusMessage,
-          data: Buffer.concat(chunks),
-        };
-
-        resolver.emit("resolve", transformedResponse);
-
-        req.removeAllListeners();
-        response.removeAllListeners();
-      });
-    });
-
-    req.once("error", (error) => {
-      resolver.emit("reject", error);
-      req.removeAllListeners();
-    });
-
-    req.once("end", () => {
-      req.removeAllListeners();
-    });
-
-    req.end();
-
-    if (this.willSendRequest) {
-      this.willSendRequest(url, req);
-    }
-
-    return new Promise((resolve, reject) => {
-      resolver.once("resolve", resolve).once("reject", reject);
-    });
+  post = (
+    pathOrUrl: string | URL,
+    reqOpts?: RequestOptions,
+    data?: Consumable,
+    telemetry?: EventEmitter,
+  ): Promise<ConsumedResponse<Buffer>> => {
+    const opts = this.combineOpts(Method.Post, reqOpts);
+    return this.request(pathOrUrl, opts, data, telemetry).then(
+      toBufferResponse,
+    );
   };
 
   delete = (
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
-  ): Promise<IncomingMessage> => {
-    const url = this.buildUrl(pathOrUrl);
+    telemetry?: EventEmitter,
+  ): Promise<ConsumedResponse<Buffer>> => {
     const opts = this.combineOpts(Method.Delete, reqOpts);
-
-    return new Promise((resolve, reject) => {
-      const req = request(url, opts)
-        .once("error", reject)
-        .once("response", resolve);
-
-      if (this.willSendRequest) {
-        this.willSendRequest(url, req);
-      }
-
-      return req.end();
-    });
+    return this.request(pathOrUrl, opts, undefined, telemetry).then(
+      toBufferResponse,
+    );
   };
 
-  post = async (
+  request = (
     pathOrUrl: string | URL,
-    body: Consumable,
-    reqOpts?: RequestOptions,
+    reqOpts: RequestOptions,
+    data?: Consumable,
+    telemetry?: EventEmitter,
   ): Promise<IncomingMessage> => {
-    const url = this.buildUrl(pathOrUrl);
-    const opts = this.combineOpts(Method.Post, reqOpts);
-
-    return this.write(url, body, opts);
-  };
-
-  private write = (
-    url: URL,
-    body: Consumable,
-    opts: RequestOptions,
-  ): Promise<IncomingMessage> => {
-    if (!isConsumable(body)) {
+    if (data && !isConsumable(data)) {
       return Promise.reject(
         new TypeError("body must be one of: Readable, Buffer, string"),
       );
     }
 
+    const contentLength = getContentLength(data);
+
+    if (typeof contentLength === "number" && contentLength !== NaN) {
+      Object.assign(reqOpts, {
+        headers: {
+          ...reqOpts.headers,
+          "content-length": contentLength,
+        },
+      });
+    }
+
+    const resolver = new EventEmitter();
+
+    const url = this.buildUrl(pathOrUrl);
+
+    const req = request(url, reqOpts);
+
+    req.setMaxListeners(5);
+
+    telemetry?.emit(
+      EventType.RequestStreamInitialised,
+      new TelemetryEvent(EventType.RequestStreamInitialised, { url, reqOpts }),
+    );
+
+    req.once("socket", (socket) => {
+      telemetry?.emit(
+        EventType.SocketObtained,
+        new TelemetryEvent(EventType.SocketObtained),
+      );
+
+      socket.once("connect", () => {
+        telemetry?.emit(
+          EventType.ConnectionEstablished,
+          new TelemetryEvent(EventType.ConnectionEstablished),
+        );
+      });
+    });
+
+    req.once("response", (res) => {
+      telemetry?.emit(
+        EventType.ResponseStreamReceived,
+        new TelemetryEvent(EventType.ResponseStreamReceived),
+      );
+
+      resolver.emit("resolve", res);
+    });
+
+    req.once("error", (error) => {
+      // See https://nodejs.org/api/http.html#http_request_destroy_error
+      //
+      // No further events will be emitted.
+      // All listeners will be removed once the request is garbage collected.
+      // Remaining data in the response will be dropped and the socket will be destroyed.
+      req.destroy();
+
+      telemetry?.emit(
+        EventType.RequestError,
+        new TelemetryEvent(EventType.RequestError, undefined, error),
+      );
+
+      resolver.emit("reject", error);
+    });
+
+    if (data instanceof Readable) {
+      // If there is an error reading data, destroy the request and pass the error.
+      data.once("error", (error) => {
+        // See https://nodejs.org/api/http.html#http_request_destroy_error
+        //
+        // No further events will be emitted.
+        // All listeners will be removed once the request is garbage collected.
+        // Remaining data in the response will be dropped and the socket will be destroyed.
+        req.destroy(error);
+      });
+
+      // Pipe ends the writable stream (req) implicitly.
+      // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
+      data.pipe(req);
+    } else {
+      req.end(data);
+    }
+
+    telemetry?.emit(
+      EventType.RequestStreamEnded,
+      new TelemetryEvent(EventType.RequestStreamEnded),
+    );
+
     return new Promise((resolve, reject) => {
-      const req = request(url, opts)
-        .once("error", reject)
-        .once("response", resolve);
-
-      if (this.willSendRequest) {
-        this.willSendRequest(url, req);
-      }
-
-      if (body instanceof Readable) {
-        // If there is an error reading data,
-        // destroy the request and pass the error.
-        body.once("error", req.destroy);
-
-        // Pipe ends the writable stream (req) implicitly.
-        // See https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options.
-        body.pipe(req);
-      } else {
-        // Buffers or strings can simply be written.
-        req.write(body);
-        req.end();
-      }
+      resolver.once("resolve", resolve);
+      resolver.once("reject", reject);
     });
   };
 
@@ -194,10 +175,26 @@ export class HttpClient {
   });
 }
 
-const isConsumable = (chunks: Consumable): chunks is Consumable => {
+const isConsumable = (
+  maybeConsumable: Consumable,
+): maybeConsumable is Consumable => {
   return (
-    Buffer.isBuffer(chunks) ||
-    chunks instanceof Readable ||
-    typeof chunks === "string"
+    Buffer.isBuffer(maybeConsumable) ||
+    maybeConsumable instanceof Readable ||
+    typeof maybeConsumable === "string"
   );
 };
+
+const getContentLength = (data?: Consumable): number | undefined => {
+  if (Buffer.isBuffer(data)) return Buffer.byteLength(data);
+  if (typeof data === "string") return data.length;
+
+  // In all other cases, we don't provide a built-in mechanism
+  // to calculate the content length.
+  //
+  // In the case of fs.ReadStream, it should be possible to use fs.stat,
+  // but for now we ask users to provide the content-length header explicitly.
+  return undefined;
+};
+
+export default HttpClient;

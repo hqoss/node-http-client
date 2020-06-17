@@ -1,11 +1,11 @@
 import { IncomingMessage } from "http";
 import { Readable } from "stream";
 
-import { StatusClass, TransformedResponse } from "./types";
+import { StatusClass, ConsumedResponse } from "./types";
 
-export const toBuffer = async (
+export const toBufferResponse = async (
   response: IncomingMessage,
-): Promise<TransformedResponse<Buffer>> => {
+): Promise<ConsumedResponse<Buffer>> => {
   if (!(response instanceof IncomingMessage)) {
     throw new TypeError("response must be instanceof IncomingMessage");
   }
@@ -22,10 +22,10 @@ export const toBuffer = async (
   };
 };
 
-export const toJSON = async <T = any>(
+export const toJSONResponse = async <T = any>(
   response: IncomingMessage,
-): Promise<TransformedResponse<T>> => {
-  const { data, ...rest } = await toBuffer(response);
+): Promise<ConsumedResponse<T>> => {
+  const { data, ...rest } = await toBufferResponse(response);
 
   if (Buffer.byteLength(data) === 0) {
     throw new TypeError("cannot convert empty buffer to JSON");
@@ -37,7 +37,7 @@ export const toJSON = async <T = any>(
   };
 };
 
-const readableToBuffer = async (source: Readable) => {
+export const readableToBuffer = async (source: Readable) => {
   const chunks = [];
   for await (const chunk of source) {
     chunks.push(chunk);
