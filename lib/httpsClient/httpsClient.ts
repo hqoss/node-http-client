@@ -4,12 +4,11 @@ import { Readable } from "stream";
 
 import { EventType, TelemetryEvent } from "../httpClient/telemetry";
 import {
-  ConsumedResponse,
   Consumable,
   HttpsRequestInterceptor,
   Method,
 } from "../httpClient/types";
-import { toBufferResponse } from "../httpClient/transform";
+import { IncomingMessage } from "http";
 
 class HttpsClient {
   private baseUrl: string;
@@ -37,7 +36,7 @@ class HttpsClient {
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Get, reqOpts, undefined, telemetry);
 
   post = (
@@ -45,7 +44,7 @@ class HttpsClient {
     data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
 
   delete = (
@@ -53,7 +52,7 @@ class HttpsClient {
     data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Delete, reqOpts, data, telemetry);
 
   request = (
@@ -62,7 +61,7 @@ class HttpsClient {
     reqOpts?: RequestOptions,
     data?: Consumable,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> => {
+  ): Promise<IncomingMessage> => {
     if (data && !isConsumable(data)) {
       return Promise.reject(
         new TypeError("body must be one of: Readable, Buffer, string"),
@@ -117,13 +116,7 @@ class HttpsClient {
         new TelemetryEvent(EventType.ResponseStreamReceived),
       );
 
-      toBufferResponse(res)
-        .then((bufferResponse) => {
-          resolver.emit("resolve", bufferResponse);
-        })
-        .catch((error) => {
-          resolver.emit("reject", error);
-        });
+      resolver.emit("resolve", res);
     });
 
     req.once("error", (error) => {

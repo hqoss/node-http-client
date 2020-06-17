@@ -35,13 +35,9 @@ export const toJSONResponse = async <T = any>(
 
   const { data, ...rest } = consumedResponse;
 
-  if (Buffer.byteLength(data) === 0) {
-    throw new TypeError("cannot convert empty buffer to JSON");
-  }
-
   return {
     ...rest,
-    data: JSON.parse(data.toString()),
+    data: Buffer.byteLength(data) > 0 ? JSON.parse(data.toString()) : "",
   };
 };
 

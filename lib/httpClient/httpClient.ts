@@ -1,15 +1,9 @@
 import { EventEmitter } from "events";
-import { Agent, request, RequestOptions } from "http";
+import { Agent, IncomingMessage, request, RequestOptions } from "http";
 import { Readable } from "stream";
 
 import { EventType, TelemetryEvent } from "./telemetry";
-import {
-  ConsumedResponse,
-  Consumable,
-  HttpRequestInterceptor,
-  Method,
-} from "./types";
-import { toBufferResponse } from "./transform";
+import { Consumable, HttpRequestInterceptor, Method } from "./types";
 
 class HttpClient {
   private baseUrl: string;
@@ -37,7 +31,7 @@ class HttpClient {
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Get, reqOpts, undefined, telemetry);
 
   post = (
@@ -45,7 +39,7 @@ class HttpClient {
     data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
 
   delete = (
@@ -53,7 +47,7 @@ class HttpClient {
     data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> =>
+  ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Delete, reqOpts, data, telemetry);
 
   request = (
@@ -62,7 +56,7 @@ class HttpClient {
     reqOpts?: RequestOptions,
     data?: Consumable,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> => {
+  ): Promise<IncomingMessage> => {
     if (data && !isConsumable(data)) {
       return Promise.reject(
         new TypeError("body must be one of: Readable, Buffer, string"),
@@ -117,13 +111,7 @@ class HttpClient {
         new TelemetryEvent(EventType.ResponseStreamReceived),
       );
 
-      toBufferResponse(res)
-        .then((bufferResponse) => {
-          resolver.emit("resolve", bufferResponse);
-        })
-        .catch((error) => {
-          resolver.emit("reject", error);
-        });
+      resolver.emit("resolve", res);
     });
 
     req.once("error", (error) => {
