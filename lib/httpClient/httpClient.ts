@@ -37,32 +37,24 @@ class HttpClient {
     pathOrUrl: string | URL,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> => {
-    return this.request(pathOrUrl, Method.Get, reqOpts, undefined, telemetry);
-  };
+  ): Promise<ConsumedResponse<Buffer>> =>
+    this.request(pathOrUrl, Method.Get, reqOpts, undefined, telemetry);
 
   post = (
     pathOrUrl: string | URL,
-    data: Consumable,
+    data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> => {
-    return this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
-  };
+  ): Promise<ConsumedResponse<Buffer>> =>
+    this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
 
   delete = (
     pathOrUrl: string | URL,
+    data?: Consumable,
     reqOpts?: RequestOptions,
     telemetry?: EventEmitter,
-  ): Promise<ConsumedResponse<Buffer>> => {
-    return this.request(
-      pathOrUrl,
-      Method.Delete,
-      reqOpts,
-      undefined,
-      telemetry,
-    );
-  };
+  ): Promise<ConsumedResponse<Buffer>> =>
+    this.request(pathOrUrl, Method.Delete, reqOpts, data, telemetry);
 
   request = (
     pathOrUrl: string | URL,
