@@ -184,6 +184,10 @@ class HttpClient {
   ): RequestOptions => ({
     ...this.baseReqOpts,
     ...reqOpts,
+    headers: {
+      ...this.baseReqOpts?.headers,
+      ...reqOpts?.headers,
+    },
     method,
   });
 }

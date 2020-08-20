@@ -110,7 +110,11 @@ tests.set("perform GET request, get back response", () => {
   const telemetry = new EventEmitter();
 
   telemetry.once(EventType.RequestStreamInitialised, ({ data: { opts } }) => {
-    assert.deepStrictEqual(opts, { agent: false, method: Method.Get });
+    assert.deepStrictEqual(opts, {
+      agent: false,
+      headers: {},
+      method: Method.Get,
+    });
   });
   telemetry.once(EventType.RequestStreamEnded, noop);
   telemetry.once(EventType.SocketObtained, noop);
