@@ -42,6 +42,22 @@ class HttpClient {
   ): Promise<IncomingMessage> =>
     this.request(pathOrUrl, Method.Post, reqOpts, data, telemetry);
 
+  patch = (
+    pathOrUrl: string | URL,
+    data?: Consumable,
+    reqOpts?: RequestOptions,
+    telemetry?: EventEmitter,
+  ): Promise<IncomingMessage> =>
+    this.request(pathOrUrl, Method.Patch, reqOpts, data, telemetry);
+
+  put = (
+    pathOrUrl: string | URL,
+    data?: Consumable,
+    reqOpts?: RequestOptions,
+    telemetry?: EventEmitter,
+  ): Promise<IncomingMessage> =>
+    this.request(pathOrUrl, Method.Put, reqOpts, data, telemetry);
+
   delete = (
     pathOrUrl: string | URL,
     data?: Consumable,

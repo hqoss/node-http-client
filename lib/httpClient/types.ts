@@ -7,8 +7,9 @@ export type Consumable = Readable | Buffer | string;
 export enum Method {
   Get = "GET",
   Post = "POST",
+  Patch = "PATCH",
+  Put = "PUT",
   Delete = "DELETE",
-  // TODO add more...
 }
 
 export enum StatusClass {
