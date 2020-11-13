@@ -151,7 +151,10 @@ class HttpsClient {
       resolver.emit("reject", error);
     });
 
-    if (data instanceof Readable) {
+    if (
+      (data instanceof EventEmitter && typeof data.pipe === "function") ||
+      data instanceof Readable
+    ) {
       // If there is an error reading data, destroy the request and pass the error.
       data.once("error", (error) => {
         // See https://nodejs.org/api/http.html#http_request_destroy_error
@@ -203,6 +206,8 @@ const isConsumable = (
   return (
     Buffer.isBuffer(maybeConsumable) ||
     maybeConsumable instanceof Readable ||
+    (maybeConsumable instanceof EventEmitter &&
+      typeof maybeConsumable.pipe === "function") ||
     typeof maybeConsumable === "string"
   );
 };

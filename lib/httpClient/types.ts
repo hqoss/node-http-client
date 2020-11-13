@@ -1,8 +1,18 @@
 import type { IncomingHttpHeaders, RequestOptions } from "http";
-import type { Readable } from "stream";
 import type { RequestOptions as SecureRequestOptions } from "https";
+import { EventEmitter } from "events";
+import type { Readable } from "stream";
 
-export type Consumable = Readable | Buffer | string;
+export type Consumable =
+  | Readable
+  | Buffer
+  | string
+  | (EventEmitter & {
+      pipe<T extends NodeJS.WritableStream>(
+        destination: T,
+        options?: { end?: boolean },
+      ): T;
+    });
 
 export enum Method {
   Get = "GET",

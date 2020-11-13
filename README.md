@@ -1,67 +1,63 @@
 ![Node.js CI](https://github.com/hqoss/node-http-client/workflows/Node.js%20CI/badge.svg)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Grade)
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com&utm_medium=referral&utm_content=hqoss/node-http-client&utm_campaign=Badge_Coverage)
-[![GuardRails badge](https://badges.guardrails.io/hqoss/node-http-client.svg?token=030dd9506fbf19af907d144a89e2973e05876de87f886a9df07e88581d6119fe&provider=github)](https://dashboard.guardrails.io/gh/hqoss/36608)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com\&utm_medium=referral\&utm_content=hqoss/node-http-client\&utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/65406302416243f788cee055ce10821a)](https://www.codacy.com/gh/hqoss/node-http-client?utm_source=github.com\&utm_medium=referral\&utm_content=hqoss/node-http-client\&utm_campaign=Badge_Coverage)
+[![GuardRails badge](https://badges.guardrails.io/hqoss/node-http-client.svg?token=030dd9506fbf19af907d144a89e2973e05876de87f886a9df07e88581d6119fe\&provider=github)](https://dashboard.guardrails.io/gh/hqoss/36608)
 ![npm](https://img.shields.io/npm/v/@hqoss/http-client)
 
 # 🔌 Node Http Client
 
-A light-weight, performant, composable blueprint for writing **consistent _and_ re-usable** Node.js HTTP clients.
-
-Extends `node-fetch`, therefore 100% compatible with the underlying APIs.
+A light-weight, performant, composable blueprint for writing **consistent *and* re-usable** Node.js HTTP(S) clients.
 
 ## Table of contents
 
--   [🤔 Why use `http-client`](#-why-use-http-client)
+*   [🤔 Why use `http-client`](#-why-use-http-client)
 
--   [⏳ Install](#-install)
+*   [⏳ Install](#-install)
 
--   [📝 Usage](#-usage)
+*   [📝 Usage](#-usage)
 
-    -   [SDK-like HTTP client](#sdk-like-http-client)
-    -   [Advanced example](#advanced-example)
-    -   [Gotchas and useful know-how](#gotchas-and-useful-know-how)
-    -   [API Docs](#api-docs)
+    *   [SDK-like HTTP client](#sdk-like-http-client)
+    *   [Advanced example](#advanced-example)
+    *   [Gotchas and useful know-how](#gotchas-and-useful-know-how)
+    *   [API Docs](#api-docs)
 
--   [⚡️ Performance](#️-performance)
+*   [⚡️ Performance](#️-performance)
 
--   [Core design principles](#core-design-principles)
+*   [Core design principles](#core-design-principles)
 
--   [Node version support](#node-version-support)
+*   [Node version support](#node-version-support)
 
-    -   [Why ES2018](#why-es2018)
+    *   [Why ES2018](#why-es2018)
 
--   [Testing](#testing)
+*   [Testing](#testing)
 
--   [TODO](#todo)
+*   [TODO](#todo)
 
 ## 🤔 Why use `http-client`
 
 ... as opposed to `request` or `node-fetch`?
 
--   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
--   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
+*   `request` is/was great, but it [has entered maintenance mode](https://github.com/request/request/issues/3142).
+*   Both `node-fetch` and `request` are relatively low-level (in JavaScript terms) implementations and as such lack certain convenience methods/APIs that help design maintainable and consistent HTTP clients. This is especially true in the microservices architecture context, where consistency is paramount.
 
-**`http-client` builds on `node-fetch` to enable composable and re-usable HTTP client implementations.**
+**`http-client` builds on the Node.js `http` module to enable highly performant, composable, and re-usable HTTP client implementations.**
 
--   Enforces a consistent approach to writing HTTP clients.
+*   Enforces a consistent approach to writing HTTP clients.
 
--   Greatly reduces common boilerplate, expressly
-    -   authentication,
-    -   default headers,
-    -   default options,
-    -   composing urls,
-    -   connection pooling,
-    -   parsing responses, and more.
+*   Greatly reduces common boilerplate, expressly
+    *   authentication,
+    *   default headers,
+    *   default options,
+    *   composing urls,
+    *   connection pooling,
+    *   parsing responses, and more.
 
--   It is written in TypeScript.
+*   It is written in TypeScript.
 
 ## ⏳ Install
 
 ```bash
 npm install @hqoss/http-client
-# Additionally, for TypeScript users
-npm install @types/node-fetch --save-dev
 ```
 
 **⚠️ NOTE:** The project is configured to target `ES2018` and the library uses `commonjs` module resolution. Read more in the [Node version support](#node-version-support) section.
@@ -291,7 +287,7 @@ app.get("/users/:userId", async (req, res, next) => {
 
 ### Gotchas and useful know-how
 
-1.  `json` mode is _not_ the default. It needs to be enabled explicitly in the `constructor`.
+1.  `json` mode is *not* the default. It needs to be enabled explicitly in the `constructor`.
 
 ```typescript
 import { HttpClient } from "@hqoss/http-client";
@@ -303,7 +299,7 @@ class UsersService extends HttpClient {
 }
 ```
 
-2.  Non-ok responses are _not_ rejected by default. You can mimic this behaviour in the `transformResponse` lifecycle method.
+2.  Non-ok responses are *not* rejected by default. You can mimic this behaviour in the `transformResponse` lifecycle method.
 
 ```typescript
 import { HttpClient, jsonResponseTransformer, ResponseTransformer } from "@hqoss/http-client";
@@ -335,7 +331,7 @@ class UsersService extends HttpClient {
 
 [See full API Documentation here](docs/globals.md).
 
-**⚠️ WARNING:** Unlike `request`, `http-client` (using `node-fetch` under the hood) does _NOT_ reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see example above).
+**⚠️ WARNING:** Unlike `request`, `http-client` (using `node-fetch` under the hood) does *NOT* reject non-ok responses by default as per [the whatwg spec](https://fetch.spec.whatwg.org/#fetch-method). You can, however, mimic this behaviour with a custom `responseTransformer` (see example above).
 
 ## ⚡️ Performance
 
@@ -345,9 +341,9 @@ For reference, we performed a number of benchmarks comparing the out-of-the-box 
 
     | wrk | -HTTP-> | Server A -> HttpClient | -HTTP-> | Server B -> data in memory |
 
--   Default `request` setup (used by _most_ projects): 10,893 requests in 30.08s; **362.19 requests/sec**
--   Default `node-fetch` setup (used by _many_ projects): 8,632 requests in 30.08s; **286.98 requests/sec**
--   Default `http-client` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
+*   Default `request` setup (used by *most* projects): 10,893 requests in 30.08s; **362.19 requests/sec**
+*   Default `node-fetch` setup (used by *many* projects): 8,632 requests in 30.08s; **286.98 requests/sec**
+*   Default `http-client` setup: 71,359 requests in 30.10s; **2,370.72 requests/sec**
 
 Please note that these benchmarks were run through `wrk`, each lasting 30 seconds, using 5 threads and keeping 500 connections open.
 
@@ -363,11 +359,11 @@ const opts = {
 
 ## Core design principles
 
--   **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
+*   **Code quality**; This package may end up being used in mission-critical software, so it's important that the code is performant, secure, and battle-tested.
 
--   **Developer experience**; Developers must be able to use this package with no significant barriers to entry. It has to be easy-to-find, well-documented, and pleasant to use.
+*   **Developer experience**; Developers must be able to use this package with no significant barriers to entry. It has to be easy-to-find, well-documented, and pleasant to use.
 
--   **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
+*   **Modularity & Configurability**; It's important that users can compose and easily change the ways in which they consume and work with this package.
 
 ## Node version support
 
@@ -397,12 +393,12 @@ We prefer using [Nock](https://github.com/nock/nock) over mocking.
 
 A quick and dirty tech debt tracker before we move to Issues.
 
--   [ ] Write a **Contributing** guide
--   [ ] Complete testing section, add best practices
--   [ ] Describe scripts and usage, add best practices
--   [ ] Add typespec and generate docs
--   [ ] Describe security best practices, e.g. `npm doctor`, `npm audit`, `npm outdated`, `ignore-scripts` in `.npmrc`, etc.
--   [ ] Add "Why should I use this" section
--   [ ] Implement and document support for basic auth
--   [ ] Document `willSendRequest` and `reponseTransformer`
--   [ ] Library architectural design (+ diagram?)
+*   \[ ] Write a **Contributing** guide
+*   \[ ] Complete testing section, add best practices
+*   \[ ] Describe scripts and usage, add best practices
+*   \[ ] Add typespec and generate docs
+*   \[ ] Describe security best practices, e.g. `npm doctor`, `npm audit`, `npm outdated`, `ignore-scripts` in `.npmrc`, etc.
+*   \[ ] Add "Why should I use this" section
+*   \[ ] Implement and document support for basic auth
+*   \[ ] Document `willSendRequest` and `reponseTransformer`
+*   \[ ] Library architectural design (+ diagram?)
