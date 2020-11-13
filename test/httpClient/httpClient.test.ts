@@ -322,6 +322,7 @@ tests.set("handle keep-alive", () => {
           data,
           headers: {
             "content-length": `${Buffer.byteLength(data)}`,
+            "keep-alive": "timeout=5",
             connection: "keep-alive",
             date,
           },
