@@ -37,7 +37,7 @@
     "url-join": "^4.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.3",
+    "@types/jest": "^26.0.22",
     "@types/node-fetch": "^2.5.7",
     "@types/url-join": "^4.0.0",
     "jest": "^26.0.1",
