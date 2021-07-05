@@ -41,7 +41,7 @@
     "@types/node-fetch": "^2.5.7",
     "@types/url-join": "^4.0.0",
     "jest": "^26.0.1",
-    "nock": "^12.0.3",
+    "nock": "^13.1.1",
     "prettier": "2.0.5",
     "ts-jest": "^26.1.0",
     "typedoc": "^0.17.7",
